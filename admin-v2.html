@@ -38,8 +38,7 @@ th{background:#f9fafb;font-weight:600;color:#555}
 .abtn.purple{background:#ede9fe;color:#7c3aed}
 .abtn.orange{background:#ffedd5;color:#ea580c}
 .abtn.red{background:#fee2e2;color:#dc2626}
-.abtn.gray{background:#f3f4f6;color:#6b7280}
-.file-input{display:none}
+.abtn.cyan{background:#cffafe;color:#0891b2}
 .sts{text-align:center;font-size:12px;color:#888;margin-top:8px;min-height:18px}
 .blk{text-align:center;padding:8px 0}
 .blk a{color:#2563eb;text-decoration:none;font-size:14px}
@@ -53,8 +52,7 @@ th{background:#f9fafb;font-weight:600;color:#555}
 <div class="mnav"><button onclick="cm(-1)">◀</button><b id="ML"></b><button onclick="cm(1)">▶</button></div>
 <div class="mstats" id="MS"></div>
 <table><thead><tr id="TH"></tr></thead><tbody id="TB"></tbody></table>
-
-<div class="panel" id="P1">
+<div class="panel">
 <h3 id="P1T"></h3>
 <div class="datepick">
 <label id="LBL1"></label><input type="date" id="D1">
@@ -65,17 +63,16 @@ th{background:#f9fafb;font-weight:600;color:#555}
 <button class="abtn blue" id="BMON" onclick="expMonth()"></button>
 </div>
 </div>
-
 <div class="panel">
 <h3 id="P2T"></h3>
 <div class="btn-row">
 <button class="abtn purple" id="BBKP" onclick="bkpAll()"></button>
 <button class="abtn orange" id="BIMP" onclick="document.getElementById('FI').click()"></button>
 <button class="abtn red" id="BCLR" onclick="clrData()"></button>
+<button class="abtn cyan" id="BSYNC" onclick="pullGitHub()"></button>
 </div>
-<input type="file" class="file-input" id="FI" accept=".json" onchange="impFile(this)">
+<input type="file" class="file-input" id="FI" accept=".json" onchange="impFile(this)" style="display:none">
 </div>
-
 <div class="sts" id="ST"></div>
 <div class="blk"><a href="v2.html" id="BLNK"></a></div>
 <script>
@@ -84,13 +81,13 @@ var E=[{id:1,n:'ໂອນ',z:'盘'},{id:2,n:'ມູ',z:'姆'},{id:3,n:'ຣິມ
 var y,m,AR=[],lang='lo',allData=[];
 var TXT={
 lo:{title:'📊 ຫນ້າຈໍຄຸ້ມຄອງ',sub:'ລາຍງານການເຊັນເຂົ້າລາຍເດືອນ',records:'ບັນທຶກ',full:'ທັງມື້',half:'ປາກສາ',abs:'ບໍ່ມາ',colName:'ຊື່',colTotal:'ລວມ',langBtn:'中文',yr:'ປີ',mo:'ເດືອນ',backBtn:'📋 ກັບຄືນໄປເຊັນເຂົ້າ',
-title1:'📅 ສົ່ງອອກຕາມຊ່ວງວັນທີ່',lbl1:'ຈາກ:',lbl2:'ຫາ:',btnExport:'📥 ສົ່ງອອກ CSV',btnMonth:'📥 ສົ່ງອອກເດືອນນີ້',
-title2:'💾 ສຳຮອງຂໍ້ມູນ',btnBackup:'📦 ສຳຮອງທັງໝົດ (JSON)',btnImport:'📤 ນຳເຂົ້າສຳຮອງ',btnClear:'🗑️ ລຶບທັງໝົດ',
-loading:'<span class="spinner"></span>ກຳລັງໂຫຼດ...',ok:'✅ ສຳເລັດ',err:'❌ ມີຂໍ້ຜິດພາດ',confirmClr:'ຕ້ອງການລຶບຂໍ້ມູນທັງໝົດແທ້ບໍ?'},
+title1:'📅 ສົ່ງອອກຕາມຊ່ວງວັນທີ່',lbl1:'ຈາກ:',lbl2:'ຫາ:',btnExport:'📥 CSV',btnMonth:'📥 ເດືອນນີ້',
+title2:'💾 ຈັດການຂໍ້ມູນ',btnBackup:'📦 ສຳຮອງ',btnImport:'📤 ນຳເຂົ້າ',btnClear:'🗑️ ລຶບ',btnSync:'☁️ ດຶງຈາກ GitHub',
+loading:'<span class="spinner"></span>ກຳລັງໂຫຼດ...',ok:'✅ ສຳເລັດ',err:'❌ ມີຂໍ້ຜິດພາດ',confirmClr:'ຕ້ອງການລຶບທັງໝົດ?',pullOk:'✅ ດຶງແລ້ວ'},
 zh:{title:'📊 管理后台',sub:'月度考勤汇总',records:'记录',full:'全天',half:'半天',abs:'缺勤',colName:'姓名',colTotal:'共',langBtn:'LOA',yr:'年',mo:'月',backBtn:'📋 返回签到',
 title1:'📅 按时间导出',lbl1:'从:',lbl2:'到:',btnExport:'📥 导出CSV',btnMonth:'📥 导出本月',
-title2:'💾 数据备份',btnBackup:'📦 全量备份 (JSON)',btnImport:'📤 导入备份',btnClear:'🗑️ 清空数据',
-loading:'<span class="spinner"></span>加载中...',ok:'✅ 完成',err:'❌ 出错',confirmClr:'确定要清空所有数据吗？'}
+title2:'💾 数据管理',btnBackup:'📦 备份',btnImport:'📤 导入',btnClear:'🗑️ 清空',btnSync:'☁️ 从GitHub拉取',
+loading:'<span class="spinner"></span>加载中...',ok:'✅ 完成',err:'❌ 出错',confirmClr:'确定要清空所有数据吗？',pullOk:'✅ 已拉取'}
 };
 function toggleLang(){lang=(lang==='lo')?'zh':'lo';localStorage.setItem('att_lang',lang);ui();render();}
 function ui(){var t=TXT[lang];document.getElementById('LB').textContent=t.langBtn;
@@ -99,7 +96,8 @@ document.getElementById('BLNK').textContent=t.backBtn;
 document.getElementById('P1T').textContent=t.title1;document.getElementById('LBL1').textContent=t.lbl1;document.getElementById('LBL2').textContent=t.lbl2;
 document.getElementById('BEXP').textContent=t.btnExport;document.getElementById('BMON').textContent=t.btnMonth;
 document.getElementById('P2T').textContent=t.title2;document.getElementById('BBKP').textContent=t.btnBackup;
-document.getElementById('BIMP').textContent=t.btnImport;document.getElementById('BCLR').textContent=t.btnClear;}
+document.getElementById('BIMP').textContent=t.btnImport;document.getElementById('BCLR').textContent=t.btnClear;
+document.getElementById('BSYNC').textContent=t.btnSync;}
 function init(){var d=new Date();y=d.getFullYear();m=d.getMonth();var dd=new Date(y,m,1);var de=new Date(y,m+1,0);
 document.getElementById('D1').value=fmt(dd);document.getElementById('D2').value=fmt(de);}
 function fmt(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -131,14 +129,14 @@ function bkpAll(){var s=getSrc();if(s.length===0){alert('No data');return;}
 var b=new Blob([JSON.stringify(s,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='attendance_backup_'+fmt(new Date())+'.json';a.click();}
 function impFile(el){var f=el.files[0];if(!f)return;var r=new FileReader();
 r.onload=function(e){try{var d=JSON.parse(e.target.result);if(!Array.isArray(d)){alert('Invalid');return;}
-var s=getSrc();var nd=s.concat(d);localStorage.setItem('att2',JSON.stringify(nd));allData=nd;render();
-var st=document.getElementById('ST');st.textContent=TXT[lang].ok+' ('+d.length+')';setTimeout(function(){st.textContent='';},3000);
+var s=getSrc().concat(d);localStorage.setItem('att2',JSON.stringify(s));allData=s;render();
+document.getElementById('ST').textContent=TXT[lang].ok+' ('+d.length+')';setTimeout(function(){document.getElementById('ST').textContent='';},3000);
 }catch(e){alert('Parse error');}};r.readAsText(f);el.value='';}
 function clrData(){if(!confirm(TXT[lang].confirmClr))return;
 localStorage.removeItem('att2');allData=[];render();document.getElementById('ST').textContent=TXT[lang].ok;}
-function loadData(){var t=TXT[lang];var st=document.getElementById('ST');st.innerHTML=t.loading;
-fetch(RAW+'?t='+Date.now()).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(d){allData=d;st.innerHTML=t.ok;render();}).catch(function(){st.innerHTML=t.loadErr||'';render();});}
-lang=localStorage.getItem('att_lang')||'lo';init();ui();loadData();
+function pullGitHub(){var t=TXT[lang];var st=document.getElementById('ST');st.innerHTML=t.loading;
+fetch(RAW+'?t='+Date.now()).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(d){allData=d;localStorage.setItem('att2',JSON.stringify(d));render();st.textContent=t.pullOk;setTimeout(function(){st.textContent='';},2000);}).catch(function(){st.textContent=t.err;});}
+lang=localStorage.getItem('att_lang')||'lo';init();ui();pullGitHub();
 </script>
 </body>
 </html>
