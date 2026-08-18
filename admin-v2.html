@@ -29,6 +29,9 @@ th{background:#f9fafb;font-weight:600;color:#555}
 .ebtn{width:100%;padding:12px;background:#2563eb;color:white;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;margin:16px 0;font-family:sans-serif}
 .blk{text-align:center;padding:8px 0}
 .blk a{color:#2563eb;text-decoration:none;font-size:14px}
+.spinner{display:inline-block;width:12px;height:12px;border:2px solid #ddd;border-top-color:#2563eb;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sts{text-align:center;font-size:12px;color:#888;margin-top:8px}
 </style>
 </head>
 <body>
@@ -39,12 +42,16 @@ th{background:#f9fafb;font-weight:600;color:#555}
 <table><thead><tr id="TH"></tr></thead><tbody id="TB"></tbody></table>
 <button class="ebtn" id="EBTN" onclick="ec()"></button>
 <div class="blk"><a href="v2.html" id="BLNK"></a></div>
+<div class="sts" id="ST"></div>
 <script>
+var REPO='guocheng1378/attendance-tracker',RAW='https://raw.githubusercontent.com/'+REPO+'/main/data.json';
 var E=[{id:1,n:'ໂອນ',z:'盘'},{id:2,n:'ມູ',z:'姆'},{id:3,n:'ຣິມ',z:'松'},{id:4,n:'ບາວ',z:'巴'},{id:5,n:'ຊົງ',z:'恩'},{id:6,n:'ຈົງ',z:'乐昂'},{id:7,n:'ເບີນ',z:'文'},{id:8,n:'ຕົງ',z:'米'},{id:9,n:'ຈົງ',z:'拽'},{id:10,n:'ກິນ',z:'春'},{id:11,n:'ຄົງ',z:'研'},{id:12,n:'ມົວ',z:'罗'}];
-var y,m,AR=[],lang='lo';
+var y,m,AR=[],lang='lo',allData=[];
 var TXT={
-lo:{title:'📊 ຫນ້າຈໍຄຸ້ມຄອງ',sub:'ລາຍງານການເຊັນເຂົ້າລາຍເດືອນ',records:'ບັນທຶກ',full:'ທັງມື້',half:'ປາກສາ',abs:'ບໍ່ມາ',colName:'ຊື່',colTotal:'ລວມ',exportBtn:'📥 ສົ່ງອອກ CSV',backBtn:'📋 ກັບຄືນໄປເຊັນເຂົ້າ',langBtn:'中文',yr:'ປີ',mo:'ເດືອນ'},
-zh:{title:'📊 管理后台',sub:'月度考勤汇总',records:'记录',full:'全天',half:'半天',abs:'缺勤',colName:'姓名',colTotal:'共',exportBtn:'📥 导出 CSV',backBtn:'📋 返回签到',langBtn:'LOA',yr:'年',mo:'月'}
+lo:{title:'📊 ຫນ້າຈໍຄຸ້ມຄອງ',sub:'ລາຍງານການເຊັນເຂົ້າລາຍເດືອນ',records:'ບັນທຶກ',full:'ທັງມື້',half:'ປາກສາ',abs:'ບໍ່ມາ',colName:'ຊື່',colTotal:'ລວມ',exportBtn:'📥 ສົ່ງອອກ CSV',backBtn:'📋 ກັບຄືນໄປເຊັນເຂົ້າ',langBtn:'中文',yr:'ປີ',mo:'ເດືອນ',
+loading:'<span class="spinner"></span>ກຳລັງໂຫຼດ...',loaded:'✅ ໂຫຼດແລ້ວ',loadErr:'❌ ໂຫຼດລົ້ມເຫລວ, ຂໍ້ມູນໃນໂທລະສັບ'},
+zh:{title:'📊 管理后台',sub:'月度考勤汇总',records:'记录',full:'全天',half:'半天',abs:'缺勤',colName:'姓名',colTotal:'共',exportBtn:'📥 导出 CSV',backBtn:'📋 返回签到',langBtn:'LOA',yr:'年',mo:'月',
+loading:'<span class="spinner"></span>加载中...',loaded:'✅ 已加载',loadErr:'❌ 加载失败，使用手机本地数据'}
 };
 function toggleLang(){lang=(lang==='lo')?'zh':'lo';localStorage.setItem('att_lang',lang);ui();render();}
 function ui(){var t=TXT[lang];document.getElementById('LB').textContent=t.langBtn;
@@ -52,10 +59,13 @@ document.getElementById('HT').textContent=t.title;
 document.getElementById('HP').textContent=t.sub;
 document.getElementById('EBTN').textContent=t.exportBtn;
 document.getElementById('BLNK').textContent=t.backBtn;}
-function init(){var d=new Date();y=d.getFullYear();m=d.getMonth();la();}
-function cm(d){m+=d;if(m>11){m=0;y++;}if(m<0){m=11;y--;}la();}
-function la(){var ym=y+'-'+String(m+1).padStart(2,'0');var r=[];try{r=JSON.parse(localStorage.getItem('att2'));}catch(e){}if(!r)r=[];AR=r.filter(function(x){return x.d>=ym+'-01'&&x.d<=ym+'-31';});render();}
+function init(){var d=new Date();y=d.getFullYear();m=d.getMonth();}
+function cm(d){m+=d;if(m>11){m=0;y++;}if(m<0){m=11;y--;}render();}
 function render(){var t=TXT[lang];document.getElementById('ML').textContent=y+' '+t.mo+' '+(m+1);
+var ym=y+'-'+String(m+1).padStart(2,'0');
+var src=allData.length>0?allData:[];
+if(src.length===0){try{src=JSON.parse(localStorage.getItem('att2'));}catch(e){}if(!src)src=[];}
+AR=src.filter(function(x){return x.d>=ym+'-01'&&x.d<=ym+'-31';});
 var ws={};E.forEach(function(e){ws[e.id]={n:e.n,z:e.z,f:0,h:0,a:0};});
 AR.forEach(function(r){if(r.w&&ws[r.w])ws[r.w][r.s]++;});
 var tf=0,th=0,ta=0;Object.values(ws).forEach(function(w){tf+=w.f;th+=w.h;ta+=w.a;});
@@ -64,7 +74,9 @@ document.getElementById('TH').innerHTML='<th>'+t.colName+'</th><th>✅ '+t.full+
 var tb='';Object.values(ws).forEach(function(w){var tt=w.f*1+w.h*0.5;tb+='<tr><td class="nm">'+w.n+'<br><small>'+w.z+'</small></td><td>'+w.f+'</td><td>'+w.h+'</td><td>'+w.a+'</td><td>'+tt+'</td></tr>';});
 document.getElementById('TB').innerHTML=tb;}
 function ec(){var t=TXT[lang];var csv='\uFEFFວັນທີ່,ຊື່,ຊື່ຈີນ,ສະຖານະ\n';var sm={f:t.full,h:t.half,a:t.abs};AR.forEach(function(r){csv+=r.d+','+r.n+','+r.z+','+sm[r.s]+'\n';});var b=new Blob([csv],{type:'text/csv;charset=utf-8'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='attendance_'+y+'_'+String(m+1).padStart(2,'0')+'.csv';a.click();}
-lang=localStorage.getItem('att_lang')||'lo';init();ui();
+function loadData(){var t=TXT[lang];var stEl=document.getElementById('ST');stEl.innerHTML=t.loading;
+fetch(RAW+'?t='+Date.now()).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(d){allData=d;stEl.innerHTML=t.loaded;render();}).catch(function(){allData=[];stEl.innerHTML=t.loadErr;render();});}
+lang=localStorage.getItem('att_lang')||'lo';init();ui();loadData();
 </script>
 </body>
 </html>
