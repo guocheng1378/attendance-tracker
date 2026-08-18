@@ -10,6 +10,7 @@ body{font-family:sans-serif;background:#f5f7fa;color:#333;max-width:480px;margin
 .hdr{text-align:center;padding:20px 0}
 .hdr h1{font-size:20px}
 .hdr p{font-size:13px;color:#888}
+.lang{position:fixed;top:12px;right:12px;background:#2563eb;color:white;border:none;border-radius:20px;padding:6px 14px;font-size:13px;font-weight:600;cursor:pointer;z-index:99}
 .mnav{display:flex;align-items:center;justify-content:center;gap:16px;margin:16px 0}
 .mnav button{background:white;border:1px solid #ddd;border-radius:12px;width:40px;height:40px;font-size:18px;cursor:pointer}
 .mnav b{font-size:16px;min-width:100px;text-align:center}
@@ -31,23 +32,39 @@ th{background:#f9fafb;font-weight:600;color:#555}
 </style>
 </head>
 <body>
-<div class="hdr"><h1>📊 ຫນ້າຈໍຄຸ້ມຄອງ</h1><p>ລາຍງານການເຊັນເຂົ້າລາຍເດືອນ</p></div>
+<button class="lang" id="LB" onclick="toggleLang()">中文</button>
+<div class="hdr"><h1 id="HT"></h1><p id="HP"></p></div>
 <div class="mnav"><button onclick="cm(-1)">◀</button><b id="ML"></b><button onclick="cm(1)">▶</button></div>
 <div class="mstats" id="MS"></div>
 <table><thead><tr id="TH"></tr></thead><tbody id="TB"></tbody></table>
-<button class="ebtn" onclick="ec()">📥 ສົ່ງອອກ CSV</button>
-<div class="blk"><a href="v2.html">📋 ກັບຄືນໄປເຊັນເຂົ້າ</a></div>
+<button class="ebtn" id="EBTN" onclick="ec()"></button>
+<div class="blk"><a href="v2.html" id="BLNK"></a></div>
 <script>
 var E=[{id:1,n:'ໂອນ',z:'盘'},{id:2,n:'ມູ',z:'姆'},{id:3,n:'ຣິມ',z:'松'},{id:4,n:'ບາວ',z:'巴'},{id:5,n:'ຊົງ',z:'恩'},{id:6,n:'ຈົງ',z:'乐昂'},{id:7,n:'ເບີນ',z:'文'},{id:8,n:'ຕົງ',z:'米'},{id:9,n:'ຈົງ',z:'拽'},{id:10,n:'ກິນ',z:'春'},{id:11,n:'ຄົງ',z:'研'},{id:12,n:'ມົວ',z:'罗'}];
-var y,m,AR=[];
+var y,m,AR=[],lang='lo';
+var TXT={
+lo:{title:'📊 ຫນ້າຈໍຄຸ້ມຄອງ',sub:'ລາຍງານການເຊັນເຂົ້າລາຍເດືອນ',records:'ບັນທຶກ',full:'ທັງມື້',half:'ປາກສາ',abs:'ບໍ່ມາ',colName:'ຊື່',colTotal:'ລວມ',exportBtn:'📥 ສົ່ງອອກ CSV',backBtn:'📋 ກັບຄືນໄປເຊັນເຂົ້າ',langBtn:'中文',yr:'ປີ',mo:'ເດືອນ'},
+zh:{title:'📊 管理后台',sub:'月度考勤汇总',records:'记录',full:'全天',half:'半天',abs:'缺勤',colName:'姓名',colTotal:'共',exportBtn:'📥 导出 CSV',backBtn:'📋 返回签到',langBtn:'LOA',yr:'年',mo:'月'}
+};
+function toggleLang(){lang=(lang==='lo')?'zh':'lo';localStorage.setItem('att_lang',lang);ui();render();}
+function ui(){var t=TXT[lang];document.getElementById('LB').textContent=t.langBtn;
+document.getElementById('HT').textContent=t.title;
+document.getElementById('HP').textContent=t.sub;
+document.getElementById('EBTN').textContent=t.exportBtn;
+document.getElementById('BLNK').textContent=t.backBtn;}
 function init(){var d=new Date();y=d.getFullYear();m=d.getMonth();la();}
 function cm(d){m+=d;if(m>11){m=0;y++;}if(m<0){m=11;y--;}la();}
 function la(){var ym=y+'-'+String(m+1).padStart(2,'0');var r=[];try{r=JSON.parse(localStorage.getItem('att2'));}catch(e){}if(!r)r=[];AR=r.filter(function(x){return x.d>=ym+'-01'&&x.d<=ym+'-31';});render();}
-function render(){var mn=['1','2','3','4','5','6','7','8','9','10','11','12'];document.getElementById('ML').textContent=y+' ເດືອນ '+mn[m];var ws={};E.forEach(function(e){ws[e.id]={n:e.n,z:e.z,f:0,h:0,a:0};});AR.forEach(function(r){if(r.w&&ws[r.w])ws[r.w][r.s]++;});var tf=0,th=0,ta=0;Object.values(ws).forEach(function(w){tf+=w.f;th+=w.h;ta+=w.a;});document.getElementById('MS').innerHTML='<div class="ms"><b>'+AR.length+'</b><small>ບັນທຶກ</small></div><div class="ms f"><b>'+tf+'</b><small>ທັງມື້</small></div><div class="ms h"><b>'+th+'</b><small>ປາກສາ</small></div><div class="ms a"><b>'+ta+'</b><small>ບໍ່ມາ</small></div>';
-document.getElementById('TH').innerHTML='<th>ຊື່</th><th>✅ ທັງມື້</th><th>⚠️ ປາກສາ</th><th>❌ ບໍ່ມາ</th><th>ລວມ</th>';
-var tb='';Object.values(ws).forEach(function(w){var t=w.f*1+w.h*0.5;tb+='<tr><td class="nm">'+w.n+'<br><small>'+w.z+'</small></td><td>'+w.f+'</td><td>'+w.h+'</td><td>'+w.a+'</td><td>'+t+'</td></tr>';});document.getElementById('TB').innerHTML=tb;}
-function ec(){var csv='\uFEFFວັນທີ່,ຊື່,ຊື່ຈີນ,ສະຖານະ\n';var sm={f:'ທັງມື້',h:'ປາກສາ',a:'ບໍ່ມາ'};AR.forEach(function(r){csv+=r.d+','+r.n+','+r.z+','+sm[r.s]+'\n';});var b=new Blob([csv],{type:'text/csv;charset=utf-8'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='attendance_'+y+'_'+String(m+1).padStart(2,'0')+'.csv';a.click();}
-init();
+function render(){var t=TXT[lang];document.getElementById('ML').textContent=y+' '+t.mo+' '+(m+1);
+var ws={};E.forEach(function(e){ws[e.id]={n:e.n,z:e.z,f:0,h:0,a:0};});
+AR.forEach(function(r){if(r.w&&ws[r.w])ws[r.w][r.s]++;});
+var tf=0,th=0,ta=0;Object.values(ws).forEach(function(w){tf+=w.f;th+=w.h;ta+=w.a;});
+document.getElementById('MS').innerHTML='<div class="ms"><b>'+AR.length+'</b><small>'+t.records+'</small></div><div class="ms f"><b>'+tf+'</b><small>'+t.full+'</small></div><div class="ms h"><b>'+th+'</b><small>'+t.half+'</small></div><div class="ms a"><b>'+ta+'</b><small>'+t.abs+'</small></div>';
+document.getElementById('TH').innerHTML='<th>'+t.colName+'</th><th>✅ '+t.full+'</th><th>⚠️ '+t.half+'</th><th>❌ '+t.abs+'</th><th>'+t.colTotal+'</th>';
+var tb='';Object.values(ws).forEach(function(w){var tt=w.f*1+w.h*0.5;tb+='<tr><td class="nm">'+w.n+'<br><small>'+w.z+'</small></td><td>'+w.f+'</td><td>'+w.h+'</td><td>'+w.a+'</td><td>'+tt+'</td></tr>';});
+document.getElementById('TB').innerHTML=tb;}
+function ec(){var t=TXT[lang];var csv='\uFEFFວັນທີ່,ຊື່,ຊື່ຈີນ,ສະຖານະ\n';var sm={f:t.full,h:t.half,a:t.abs};AR.forEach(function(r){csv+=r.d+','+r.n+','+r.z+','+sm[r.s]+'\n';});var b=new Blob([csv],{type:'text/csv;charset=utf-8'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='attendance_'+y+'_'+String(m+1).padStart(2,'0')+'.csv';a.click();}
+lang=localStorage.getItem('att_lang')||'lo';init();ui();
 </script>
 </body>
 </html>
