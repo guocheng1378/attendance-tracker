@@ -1,6 +1,6 @@
 const CONFIG={
     DEFAULT_LANG:'zh',
-    JSONBIN_URL:'https://api.jsonbin.io',
+    JSONBIN_URL:'https://api.jsonbin.io/v3',
     JSONBIN_BIN_ID:'68d31a4fafba6e29237291',
     JSONBIN_API_KEY:'$2a$10$/u58wS6WXP3lZE0TIUw5uOoQOSCpyWgBCeSEeXP81KjhgRHgDb7jq',
     EMPLOYEES:[
