@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>考勤签到</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:sans-serif;background:#f5f7fa;color:#333;max-width:480px;margin:0 auto;padding:16px}
+.hdr{text-align:center;padding:20px 0}
+.hdr h1{font-size:20px;margin-bottom:4px}
+.hdr p{font-size:13px;color:#888}
+.dnav{display:flex;align-items:center;justify-content:center;gap:16px;margin:16px 0}
+.dnav button{background:white;border:1px solid #ddd;border-radius:12px;width:40px;height:40px;font-size:18px;cursor:pointer}
+.dnav .dtxt{text-align:center;min-width:120px}
+.dnav .dtxt b{font-size:16px;display:block}
+.dnav .dtxt small{color:#2563eb;font-size:12px}
+.sbar{display:flex;justify-content:space-around;background:white;border-radius:12px;padding:12px;margin:12px 0;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.sbar span{font-size:13px;font-weight:600}
+.wlist{display:flex;flex-direction:column;gap:8px}
+.wcard{background:white;border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.wname{font-size:18px;font-weight:600}
+.wname small{font-size:13px;color:#999;font-weight:400;margin-left:8px}
+.sbtns{display:flex;gap:6px}
+.sbtn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 10px;border:2px solid #e5e7eb;border-radius:10px;background:white;cursor:pointer;font-size:11px;font-family:sans-serif}
+.sbtn .si{font-size:16px}
+.sbtn.sel{background:#f0fdf4;border-color:#22c55e}
+.sbtn.hsel{background:#fffbeb;border-color:#f59e0b}
+.sbtn.asel{background:#fef2f2;border-color:#ef4444}
+.svbar{padding:16px 0;position:sticky;bottom:0;background:linear-gradient(transparent,#f5f7fa 20%)}
+.svbtn{width:100%;padding:14px;background:#2563eb;color:white;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;font-family:sans-serif}
+.svbtn.done{background:#22c55e}
+.alnk{text-align:center;padding:8px 0}
+.alnk a{color:#2563eb;text-decoration:none;font-size:14px}
+</style>
+</head>
+<body>
+<div class="hdr">
+<h1 id="T">考勤签到表</h1>
+<p id="S">每日出勤记录</p>
+</div>
+<div class="dnav">
+<button onclick="cd(-1)">◀</button>
+<div class="dtxt"><b id="DD"></b><small id="DW"></small></div>
+<button onclick="cd(1)">▶</button>
+</div>
+<div class="sbar">
+<span>✅ 全天 <b id="sf">0</b></span>
+<span>⚠️ 半天 <b id="sh">0</b></span>
+<span>❌ 缺勤 <b id="sa">0</b></span>
+</div>
+<div class="wlist" id="WL"></div>
+<div class="svbar"><button class="svbtn" id="SB" onclick="sv()">保存记录</button></div>
+<div class="alnk"><a href="admin.html">📊 管理后台</a></div>
+<script>
+var E=[{id:1,n:'ໂອນ',z:'盘'},{id:2,n:'ມູ',z:'姆'},{id:3,n:'ຣິມ',z:'松'},{id:4,n:'ບາວ',z:'巴'},{id:5,n:'ຊົງ',z:'恩'},{id:6,n:'ຈົງ',z:'乐昂'},{id:7,n:'ເບີນ',z:'文'},{id:8,n:'ຕົງ',z:'米'},{id:9,n:'ຈົງ',z:'拽'},{id:10,n:'ກິນ',z:'春'},{id:11,n:'ຄົງ',z:'研'},{id:12,n:'ມົວ',z:'罗'}];
+var D=new Date(),SS={},dk;
+function fd(){return D.getFullYear()+'-'+String(D.getMonth()+1).padStart(2,'0')+'-'+String(D.getDate()).padStart(2,'0');}
+function rd(){document.getElementById('DD').textContent=D.toLocaleDateString('zh-CN',{month:'long',day:'numeric'});document.getElementById('DW').textContent=D.toLocaleDateString('zh-CN',{weekday:'long'});}
+function cd(d){D.setDate(D.getDate()+d);rd();ls();us();}
+function rl(){var c=document.getElementById('WL');c.innerHTML='';E.forEach(function(e){var h='<div class="wcard"><div class="wname">'+e.n+'<small>'+e.z+'</small></div><div class="sbtns">';h+='<button class="sbtn" onclick="ss('+e.id+',\'f\',this,\'sel\')"><span class="si">✅</span><span>全天</span></button>';h+='<button class="sbtn" onclick="ss('+e.id+',\'h\',this,\'hsel\')"><span class="si">⚠️</span><span>半天</span></button>';h+='<button class="sbtn" onclick="ss('+e.id+',\'a\',this,\'asel\')"><span class="si">❌</span><span>缺勤</span></button>';h+='</div></div>';c.innerHTML+=h;});}
+function ss(id,st,b,cls){SS[id]=st;b.closest('.sbtns').querySelectorAll('.sbtn').forEach(function(x){x.className='sbtn';});b.className='sbtn '+cls;us();}
+function us(){var f=0,h=0,a=0;Object.values(SS).forEach(function(s){if(s==='f')f++;else if(s==='h')h++;else a++;});document.getElementById('sf').textContent=f;document.getElementById('sh').textContent=h;document.getElementById('sa').textContent=a;}
+function ls(){dk=fd();var r=[];try{r=JSON.parse(localStorage.getItem('att2'));}catch(e){}if(!r)r=[];SS={};r.forEach(function(x){if(x.d===dk&&x.w&&x.s)SS[x.w]=x.s;});document.querySelectorAll('.wcard').forEach(function(c,i){var eid=E[i].id;var st=SS[eid];c.querySelectorAll('.sbtn').forEach(function(b){b.className='sbtn';});if(st){var map={f:0,h:1,a:2};var btn=c.querySelectorAll('.sbtn')[map[st]];if(btn){var cls={f:'sel',h:'hsel',a:'asel'};btn.className='sbtn '+cls[st];}}});us();}
+function sv(){dk=fd();var k=Object.keys(SS);if(k.length===0){alert('请先选择考勤状态');return;}var rec=[];try{rec=JSON.parse(localStorage.getItem('att2'));}catch(e){}if(!rec)rec=[];
+rec=rec.filter(function(x){return x.d!==dk;});
+E.forEach(function(e){rec.push({d:dk,w:e.id,n:e.n,z:e.z,s:SS[e.id]||'a',t:new Date().toISOString()});});
+localStorage.setItem('att2',JSON.stringify(rec));
+var b=document.getElementById('SB');b.textContent='✅ 已保存!';b.className='svbtn done';
+setTimeout(function(){b.textContent='保存记录';b.className='svbtn';},2000);}
+rd();rl();ls();us();
+</script>
+</body>
+</html>
