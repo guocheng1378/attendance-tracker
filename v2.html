@@ -33,6 +33,16 @@ body{font-family:sans-serif;background:#f5f7fa;color:#333;max-width:480px;margin
 .svbtn.done{background:#22c55e}
 .alnk{text-align:center;padding:8px 0}
 .alnk a{color:#2563eb;text-decoration:none;font-size:14px}
+.stp{margin-top:8px;padding:16px;background:white;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.stp label{font-size:13px;font-weight:600;display:block;margin-bottom:6px}
+.stp input{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-bottom:8px;font-family:monospace}
+.stp button{width:100%;padding:10px;background:#22c55e;color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
+.stp .inf{font-size:11px;color:#888;margin-top:4px}
+.sts{text-align:center;font-size:12px;color:#888;margin-top:8px}
+.sts .ok{color:#22c55e}
+.sts .err{color:#ef4444}
+.spinner{display:inline-block;width:12px;height:12px;border:2px solid #ddd;border-top-color:#2563eb;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -53,13 +63,25 @@ body{font-family:sans-serif;background:#f5f7fa;color:#333;max-width:480px;margin
 </div>
 <div class="wlist" id="WL"></div>
 <div class="svbar"><button class="svbtn" id="SBB" onclick="sv()"></button></div>
+<div class="sts" id="ST"></div>
 <div class="alnk"><a href="admin-v2.html" id="ALNK"></a></div>
+<div class="stp">
+<label id="TLBL"></label>
+<input id="TI" type="password" placeholder="ghp_xxx...">
+<button id="TBTN" onclick="svt()"></button>
+<p class="inf" id="TINF"></p>
+</div>
 <script>
+var REPO='guocheng1378/attendance-tracker',URL='https://api.github.com/repos/'+REPO+'/contents/data.json',RAW='https://raw.githubusercontent.com/'+REPO+'/main/data.json';
 var E=[{id:1,n:'ໂອນ',z:'盘'},{id:2,n:'ມູ',z:'姆'},{id:3,n:'ຣິມ',z:'松'},{id:4,n:'ບາວ',z:'巴'},{id:5,n:'ຊົງ',z:'恩'},{id:6,n:'ຈົງ',z:'乐昂'},{id:7,n:'ເບີນ',z:'文'},{id:8,n:'ຕົງ',z:'米'},{id:9,n:'ຈົງ',z:'拽'},{id:10,n:'ກິນ',z:'春'},{id:11,n:'ຄົງ',z:'研'},{id:12,n:'ມົວ',z:'罗'}];
-var D=new Date(),SS={},dk,lang='lo';
+var D=new Date(),SS={},dk,lang='lo',ghToken='',dataSHA='',allData=[];
 var TXT={
-lo:{title:'ຕາຕະລາງເຊັນເຂົ້າ',sub:'ບັນທຶກການເຂົ້າວຽກປະຈຳວັນ',full:'ທັງມື້',half:'ປາກສາ',abs:'ບໍ່ມາ',save:'ບັນທຶກ',saved:'✅ ຖືກບັນທຶກແລ້ວ!',empty:'ກະລຸນາເລືອກສະຖານະກ່ອນ',admin:'📊 ຫນ້າຈໍຄຸ້ມຄອງ',langBtn:'中文'},
-zh:{title:'考勤签到表',sub:'每日出勤记录',full:'全天',half:'半天',abs:'缺勤',save:'保存记录',saved:'✅ 已保存!',empty:'请先选择考勤状态',admin:'📊 管理后台',langBtn:'LOA'}
+lo:{title:'ຕາຕະລາງເຊັນເຂົ້າ',sub:'ບັນທຶກການເຂົ້າວຽກປະຈຳວັນ',full:'ທັງມື້',half:'ປາກສາ',abs:'ບໍ່ມາ',save:'ບັນທຶກ',saved:'✅ ຖືກບັນທຶກແລ້ວ!',empty:'ກະລຸນາເລືອກສະຖານະກ່ອນ',admin:'📊 ຫນ້າຈໍຄຸ້ມຄອງ',langBtn:'中文',
+tokLbl:'🔑 GitHub Token',tokBtn:'ບັນທຶກ Token',tokInf:'ເພີ່ທະບິນ GitHub Personal Access Token (repo) ເພື່ອບັນທຶກຂໍ້ມູນໃສ່ GitHub',
+syncing:'<span class="spinner"></span>ກຳລັງຊິງ...',synced:'✅ ຊິງແລ້ວ',syncErr:'❌ ຊິງລົ້ມເຫລວ',local:'📦 ບັນທຶກໃນໂທລະສັບ'},
+zh:{title:'考勤签到表',sub:'每日出勤记录',full:'全天',half:'半天',abs:'缺勤',save:'保存记录',saved:'✅ 已保存!',empty:'请先选择考勤状态',admin:'📊 管理后台',langBtn:'LOA',
+tokLbl:'🔑 GitHub Token',tokBtn:'保存 Token',tokInf:'输入 GitHub Personal Access Token (repo权限) 以同步数据到 GitHub',
+syncing:'<span class="spinner"></span>同步中...',synced:'✅ 已同步',syncErr:'❌ 同步失败',local:'📦 仅保存在手机'}
 };
 function toggleLang(){lang=(lang==='lo')?'zh':'lo';localStorage.setItem('att_lang',lang);ui();rl();ls();}
 function ui(){var t=TXT[lang];document.getElementById('LB').textContent=t.langBtn;
@@ -69,7 +91,11 @@ document.getElementById('sfl').textContent=t.full;
 document.getElementById('shl').textContent=t.half;
 document.getElementById('sal').textContent=t.abs;
 document.getElementById('SBB').textContent=t.save;
-document.getElementById('ALNK').textContent=t.admin;}
+document.getElementById('ALNK').textContent=t.admin;
+document.getElementById('TLBL').textContent=t.tokLbl;
+document.getElementById('TBTN').textContent=t.tokBtn;
+document.getElementById('TINF').textContent=t.tokInf;
+if(ghToken)document.getElementById('TI').value=ghToken;}
 function fd(){return D.getFullYear()+'-'+String(D.getMonth()+1).padStart(2,'0')+'-'+String(D.getDate()).padStart(2,'0');}
 function rd(){var wd=lang==='lo'?'lo-LA':'zh-CN';document.getElementById('DD').textContent=D.toLocaleDateString(wd,{month:'long',day:'numeric'});document.getElementById('DW').textContent=D.toLocaleDateString(wd,{weekday:'long'});}
 function cd(d){D.setDate(D.getDate()+d);rd();ls();us();}
@@ -80,14 +106,31 @@ h+='<button class="sbtn" onclick="ss('+e.id+',\'a\',this,\'asel\')"><span class=
 h+='</div></div>';c.innerHTML+=h;});}
 function ss(id,st,b,cls){SS[id]=st;b.closest('.sbtns').querySelectorAll('.sbtn').forEach(function(x){x.className='sbtn';});b.className='sbtn '+cls;us();}
 function us(){var f=0,h=0,a=0;Object.values(SS).forEach(function(s){if(s==='f')f++;else if(s==='h')h++;else a++;});document.getElementById('sf').textContent=f;document.getElementById('sh').textContent=h;document.getElementById('sa').textContent=a;}
-function ls(){dk=fd();var r=[];try{r=JSON.parse(localStorage.getItem('att2'));}catch(e){}if(!r)r=[];SS={};r.forEach(function(x){if(x.d===dk&&x.w&&x.s)SS[x.w]=x.s;});document.querySelectorAll('.wcard').forEach(function(c,i){var eid=E[i].id;var st=SS[eid];c.querySelectorAll('.sbtn').forEach(function(b){b.className='sbtn';});if(st){var map={f:0,h:1,a:2};var btn=c.querySelectorAll('.sbtn')[map[st]];if(btn){var cls={f:'sel',h:'hsel',a:'asel'};btn.className='sbtn '+cls[st];}}});us();}
-function sv(){dk=fd();var k=Object.keys(SS);var t=TXT[lang];if(k.length===0){alert(t.empty);return;}var rec=[];try{rec=JSON.parse(localStorage.getItem('att2'));}catch(e){}if(!rec)rec=[];
-rec=rec.filter(function(x){return x.d!==dk;});
-E.forEach(function(e){rec.push({d:dk,w:e.id,n:e.n,z:e.z,s:SS[e.id]||'a',t:new Date().toISOString()});});
-localStorage.setItem('att2',JSON.stringify(rec));
-var b=document.getElementById('SBB');b.textContent=t.saved;b.className='svbtn done';
-setTimeout(function(){b.textContent=t.save;b.className='svbtn';},2000);}
-lang=localStorage.getItem('att_lang')||'lo';rd();ui();rl();ls();us();
+function ls(){dk=fd();
+var src=allData.length>0?allData:[];
+if(src.length===0){try{src=JSON.parse(localStorage.getItem('att2'));}catch(e){}if(!src)src=[];}
+SS={};src.forEach(function(x){if(x.d===dk&&x.w&&x.s)SS[x.w]=x.s;});
+document.querySelectorAll('.wcard').forEach(function(c,i){var eid=E[i].id;var st=SS[eid];c.querySelectorAll('.sbtn').forEach(function(b){b.className='sbtn';});if(st){var map={f:0,h:1,a:2};var btn=c.querySelectorAll('.sbtn')[map[st]];if(btn){var cls={f:'sel',h:'hsel',a:'asel'};btn.className='sbtn '+cls[st];}}});us();}
+function sv(){dk=fd();var k=Object.keys(SS);var t=TXT[lang];if(k.length===0){alert(t.empty);return;}
+var localRec=[];try{localRec=JSON.parse(localStorage.getItem('att2'));}catch(e){}if(!localRec)localRec=[];
+localRec=localRec.filter(function(x){return x.d!==dk;});
+E.forEach(function(e){localRec.push({d:dk,w:e.id,n:e.n,z:e.z,s:SS[e.id]||'a',t:new Date().toISOString()});});
+localStorage.setItem('att2',JSON.stringify(localRec));
+if(!ghToken){allData=localRec;var b=document.getElementById('SBB');b.textContent=t.saved;b.className='svbtn done';document.getElementById('ST').innerHTML=t.local;setTimeout(function(){b.textContent=t.save;b.className='svbtn';document.getElementById('ST').innerHTML='';},2000);return;}
+allData=localRec;
+var stEl=document.getElementById('ST');stEl.innerHTML=t.syncing;
+ghSync(allData).then(function(r){if(r.ok){dataSHA=r.sha;stEl.innerHTML=t.synced;}else{stEl.innerHTML=t.syncErr;}}).catch(function(){stEl.innerHTML=t.syncErr;});
+var b=document.getElementById('SBB');b.textContent=t.saved;b.className='svbtn done';setTimeout(function(){b.textContent=t.save;b.className='svbtn';},2000);}
+function ghSync(data){var body=JSON.stringify(data,null,2);
+return fetch(URL).then(function(r){return r.json();}).then(function(f){dataSHA=f.sha;return fetch(URL,{method:'PUT',headers:{'Authorization':'token '+ghToken,'Content-Type':'application/json'},body:JSON.stringify({message:'update attendance '+dk,content:btoa(unescape(encodeURIComponent(body))),sha:f.sha,branch:'main'})});}).then(function(r){return r.json();}).then(function(d){return{ok:true,sha:d.content?d.content.sha:dataSHA};}).catch(function(){return{ok:false};});}
+function ghLoad(){if(!ghToken)return Promise.resolve();
+return fetch(RAW+'?t='+Date.now()).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(d){allData=d;return fetch(URL,{headers:{'Authorization':'token '+ghToken}});}).then(function(r){return r.json();}).then(function(f){dataSHA=f.sha;}).catch(function(){});}
+function svt(){ghToken=document.getElementById('TI').value.trim();if(ghToken){localStorage.setItem('att_gh_token',ghToken);}else{localStorage.removeItem('att_gh_token');ghToken='';}
+var stEl=document.getElementById('ST');stEl.innerHTML='<span class="spinner"></span>';ghLoad().then(function(){ls();stEl.innerHTML='';ui();});}
+lang=localStorage.getItem('att_lang')||'lo';
+ghToken=localStorage.getItem('att_gh_token')||'';
+rd();ui();rl();
+if(ghToken){document.getElementById('ST').innerHTML='<span class="spinner"></span>';ghLoad().then(function(){ls();document.getElementById('ST').innerHTML='';ui();});}else{ls();}
 </script>
 </body>
 </html>
