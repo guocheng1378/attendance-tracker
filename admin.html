@@ -1,49 +1,41 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="lo">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理后台 | Admin</title>
+    <title>ແຜງຄວບຄຸມ</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="lang-switch">
-            <button id="btn-zh" class="lang-btn active" onclick="setLang('zh')">中文</button>
-            <button id="btn-la" class="lang-btn" onclick="setLang('la')">ພາສາລາວ</button>
+    <div class="admin">
+        <div class="lang-bar">
+            <button class="lang-btn active" data-lang="lo" onclick="setLang('lo')">ລາວ</button>
+            <button class="lang-btn" data-lang="zh" onclick="setLang('zh')">中文</button>
         </div>
-        <div class="header">
-            <h1 id="admin-title">📊 考勤管理</h1>
-            <p id="admin-subtitle">查看所有签到记录</p>
-        </div>
-        <div class="filter-card">
-            <div class="filter-row">
-                <div class="filter-group"><label id="label-from">开始日期</label><input type="date" id="filter-from" /></div>
-                <div class="filter-group"><label id="label-to">结束日期</label><input type="date" id="filter-to" /></div>
-                <div class="filter-group"><label id="label-name-filter">姓名筛选</label><select id="filter-name"><option value="">全部</option></select></div>
-            </div>
-            <div class="filter-actions">
-                <button class="filter-btn" onclick="loadRecords()"><span id="btn-search">🔍 查询</span></button>
-                <button class="filter-btn export" onclick="exportCSV()"><span id="btn-export">📥 导出CSV</span></button>
+        <div class="admin-header">
+            <h1 id="admin-title">📊 ແຜງຄວບຄຸມ</h1>
+            <p id="admin-sub">ສະຫຼຸບການເຊັກອິນລາຍເດືອນ</p>
+            <div class="month-nav">
+                <button class="nav-btn" onclick="changeMonth(-1)">◀</button>
+                <div class="month-label" id="month-label"></div>
+                <button class="nav-btn" onclick="changeMonth(1)">▶</button>
             </div>
         </div>
-        <div class="stats-grid">
-            <div class="stat-card"><div class="stat-number" id="stat-total">0</div><div class="stat-label" id="stat-total-label">总记录</div></div>
-            <div class="stat-card"><div class="stat-number" id="stat-people">0</div><div class="stat-label" id="stat-people-label">出勤人数</div></div>
-            <div class="stat-card"><div class="stat-number" id="stat-late">0</div><div class="stat-label" id="stat-late-label">迟到</div></div>
-            <div class="stat-card"><div class="stat-number" id="stat-early">0</div><div class="stat-label" id="stat-early-label">早退</div></div>
+        <div class="month-stats" id="month-stats"></div>
+        <div class="summary-table-wrap">
+            <table class="summary-table" id="summary-table">
+                <thead><tr id="table-head"></tr></thead>
+                <tbody id="table-body"></tbody>
+            </table>
         </div>
-        <div class="records-section">
-            <div class="records-header"><h3 id="records-title">签到记录</h3></div>
-            <div class="records-table-wrap">
-                <table class="records-table" id="records-table">
-                    <thead><tr><th id="th-date">日期</th><th id="th-name">姓名</th><th id="th-type">类型</th><th id="th-time">时间</th><th id="th-status">状态</th><th id="th-notes">备注</th></tr></thead>
-                    <tbody id="records-body"></tbody>
-                </table>
-            </div>
-            <div class="empty-state hidden" id="empty-state"><div class="empty-icon">📭</div><div id="empty-text">暂无记录</div></div>
+        <div class="day-detail" id="day-detail">
+            <h3 id="detail-title">ລາຍລະອຽດ</h3>
+            <div id="detail-body"></div>
         </div>
-        <div class="footer-links"><a href="index.html" id="back-link">← 返回签到页</a></div>
+        <div class="export-bar">
+            <button class="export-btn" onclick="exportCSV()">📥 ສົ່ງອອກ CSV</button>
+            <a href="index.html" class="export-btn secondary" id="back-link">📋 ກັບໄປເຊັກອິນ</a>
+        </div>
     </div>
     <script src="config.js"></script>
     <script src="admin.js"></script>

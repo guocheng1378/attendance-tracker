@@ -1,92 +1,21 @@
-// ========== 配置文件 ==========
-// 请将下方 SUPABASE_URL 和 SUPABASE_ANON_KEY 替换为你自己的 Supabase 项目信息
-// 注册地址: https://supabase.com (免费，无需信用卡)
-
-const CONFIG = {
-    // Supabase 配置（必填）
-    SUPABASE_URL: 'https://YOUR_PROJECT.supabase.co',
-    SUPABASE_ANON_KEY: 'YOUR_ANON_KEY_HERE',
-
-    // 员工名单（姓名会显示在签到页面上）
-    EMPLOYEES: [
-        'ທ່ານ ວິໄລ',
-        'ທ່ານ ມີນາ',
-        'ທ່ານ ກິດ',
-        'ທ່ານ ບົວ',
-        'ທ່ານ ໂຊກ',
-        'ທ່ານ ໃຈ',
-        'ທ່ານ ແກ້ວ',
-        'ທ່ານ ມະນີ',
-        'ທ່ານ ພຸດ',
-        'ທ່ານ ສີ',
-        'ທ່ານ ອ້າຍ',
-        'ທ່ານ ເອື້ອຍ',
-        'ທ່ານ ນ້ອຍ'
+const CONFIG={
+    DEFAULT_LANG:'lo',
+    EMPLOYEES:[
+        {id:1,name:'ນາງ ສົມຫວ່າງ',nameZh:'小芳'},
+        {id:2,name:'ທ່ານ ບຸນມາ',nameZh:'本马'},
+        {id:3,name:'ນາງ ແກ້ວ',nameZh:'小玉'},
+        {id:4,name:'ທ່ານ ມີ',nameZh:'小明'},
+        {id:5,name:'ນາງ ປາກ',nameZh:'小帕'},
+        {id:6,name:'ທ່ານ ສຸກ',nameZh:'小福'},
+        {id:7,name:'ນາງ ດວງ',nameZh:'小光'},
+        {id:8,name:'ທ່ານ ວັນ',nameZh:'小万'},
+        {id:9,name:'ນາງ ແສງ',nameZh:'小亮'},
+        {id:10,name:'ທ່ານ ຄຳ',nameZh:'小金'},
+        {id:11,name:'ນາງ ຈັນ',nameZh:'小月'},
+        {id:12,name:'ທ່ານ ພ້າຍ',nameZh:'小丰'},
+        {id:13,name:'ນາງ ສີ',nameZh:'小色'}
     ],
-
-    // 上班时间（用于判断迟到）
-    WORK_START: '08:00',
-    WORK_END: '17:00',
-
-    // 默认语言：'zh' 中文 | 'la' 老挝语
-    DEFAULT_LANG: 'zh'
+    STATUS:{FULL:'full',HALF:'half',ABSENT:'absent'},
+    LO:{TITLE:'ບັນຊາການເຊັກອິນ',SUBTITLE:'ລາຍງານການເຂົ້າວຽກລາຍວັນ',FULL:'ມື້ເຕັມ',HALF:'ມື້ຄ້າງ',ABSENT:'ບໍ່ມາ',SAVE:'ບັນທຶກ',SAVED:'✅ ສຳເລັດ!',ADMIN:'📊 ແຜງຄວບຄຸມ',ADMIN_TITLE:'📊 ແຜງຄວບຄຸມ',ADMIN_SUB:'ສະຫຼຸບການເຊັກອິນລາຍເດືອນ',DETAIL:'ລາຍລະອຽດ',EXPORT:'📥 ສົ່ງອອກ CSV',BACK:'📋 ກັບໄປເຊັກອິນ',NO_DATA:'ຍັງບໍ່ມີຂໍ້ມູນ',TOTAL:'ລວມ',WORKERS:'ຄົນ'},
+    ZH:{TITLE:'考勤签到表',SUBTITLE:'每日出勤记录',FULL:'全天',HALF:'半天',ABSENT:'缺勤',SAVE:'保存记录',SAVED:'✅ 已保存!',ADMIN:'📊 管理后台',ADMIN_TITLE:'📊 管理后台',ADMIN_SUB:'月度考勤汇总',DETAIL:'详细信息',EXPORT:'📥 导出 CSV',BACK:'📋 返回签到',NO_DATA:'暂无数据',TOTAL:'共',WORKERS:'人'}
 };
-
-// ========== Supabase 操作封装 ==========
-const DB = {
-    headers() {
-        return {
-            'apikey': CONFIG.SUPABASE_ANON_KEY,
-            'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=representation'
-        };
-    },
-    async insert(record) {
-        const url = `${CONFIG.SUPABASE_URL}/rest/v1/attendance`;
-        const res = await fetch(url, { method: 'POST', headers: this.headers(), body: JSON.stringify(record) });
-        if (!res.ok) throw new Error(await res.text());
-        return await res.json();
-    },
-    async query(params = {}) {
-        let url = `${CONFIG.SUPABASE_URL}/rest/v1/attendance?order=created_at.desc`;
-        if (params.from) url += `&created_at=gte.${params.from}T00:00:00`;
-        if (params.to) url += `&created_at=lte.${params.to}T23:59:59`;
-        if (params.name) url += `&name=eq.${encodeURIComponent(params.name)}`;
-        const res = await fetch(url, { headers: this.headers() });
-        if (!res.ok) throw new Error(await res.text());
-        return await res.json();
-    },
-    async today() {
-        const today = new Date().toISOString().slice(0, 10);
-        return this.query({ from: today, to: today });
-    }
-};
-
-// ========== 本地存储 fallback ==========
-const LOCAL_DB = {
-    KEY: 'attendance_records',
-    getAll() { return JSON.parse(localStorage.getItem(this.KEY) || '[]'); },
-    insert(record) {
-        const records = this.getAll();
-        record.id = Date.now();
-        record.created_at = new Date().toISOString();
-        records.unshift(record);
-        localStorage.setItem(this.KEY, JSON.stringify(records));
-        return record;
-    },
-    query(params = {}) {
-        let records = this.getAll();
-        if (params.from) records = records.filter(r => r.created_at >= params.from + 'T00:00:00');
-        if (params.to) records = records.filter(r => r.created_at <= params.to + 'T23:59:59');
-        if (params.name) records = records.filter(r => r.name === params.name);
-        return records;
-    },
-    today() {
-        const today = new Date().toISOString().slice(0, 10);
-        return this.query({ from: today, to: today });
-    }
-};
-
-// 自动检测：Supabase 配置了就用云端，否则用本地存储
-const Store = (CONFIG.SUPABASE_URL.includes('YOUR_PROJECT')) ? LOCAL_DB : DB;

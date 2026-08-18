@@ -1,66 +1,41 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="lo">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>考勤系统 | ລະບົບການເຊັກອິນ</title>
+    <title>ລະບົບການເຊັກອິນ</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="lang-switch">
-            <button id="btn-zh" class="lang-btn active" onclick="setLang('zh')">中文</button>
-            <button id="btn-la" class="lang-btn" onclick="setLang('la')">ພາສາລາວ</button>
+    <div class="app">
+        <div class="lang-bar">
+            <button class="lang-btn active" data-lang="lo" onclick="setLang('lo')">ລາວ</button>
+            <button class="lang-btn" data-lang="zh" onclick="setLang('zh')">中文</button>
         </div>
         <div class="header">
-            <h1 id="title">员工考勤</h1>
-            <p id="subtitle">填写签到/签退信息</p>
-            <div class="date-display" id="current-date"></div>
-            <div class="time-display" id="current-time"></div>
-        </div>
-        <div class="form-card" id="checkin-card">
-            <div class="step" id="step1">
-                <div class="step-label" id="step1-label">1. 选择姓名</div>
-                <div class="name-grid" id="name-grid"></div>
-                <div class="custom-name">
-                    <input type="text" id="custom-name-input" placeholder="其他姓名 / ຊື່ອື່ນໆ" />
+            <h1 id="page-title">ບັນຊາການເຊັກອິນ</h1>
+            <p id="page-sub">ລາຍງານການເຂົ້າວຽກລາຍວັນ</p>
+            <div class="date-nav">
+                <button class="nav-btn" onclick="changeDate(-1)">◀</button>
+                <div class="date-info">
+                    <div class="date-display" id="current-date"></div>
+                    <div class="day-display" id="current-day"></div>
                 </div>
-            </div>
-            <div class="step hidden" id="step2">
-                <div class="step-label" id="step2-label">2. 签到类型</div>
-                <div class="type-btns">
-                    <button class="type-btn checkin" onclick="selectType('checkin')">
-                        <span class="type-icon">🟢</span>
-                        <span id="label-checkin">签到上班</span>
-                    </button>
-                    <button class="type-btn checkout" onclick="selectType('checkout')">
-                        <span class="type-icon">🔴</span>
-                        <span id="label-checkout">签退下班</span>
-                    </button>
-                </div>
-            </div>
-            <div class="step hidden" id="step3">
-                <div class="step-label" id="step3-label">3. 确认信息</div>
-                <div class="confirm-box">
-                    <div class="confirm-row"><span class="confirm-label" id="confirm-name-label">姓名</span><span class="confirm-value" id="confirm-name"></span></div>
-                    <div class="confirm-row"><span class="confirm-label" id="confirm-type-label">类型</span><span class="confirm-value" id="confirm-type"></span></div>
-                    <div class="confirm-row"><span class="confirm-label" id="confirm-time-label">时间</span><span class="confirm-value" id="confirm-time"></span></div>
-                    <div class="confirm-row"><span class="confirm-label" id="confirm-date-label">日期</span><span class="confirm-value" id="confirm-date"></span></div>
-                </div>
-                <textarea id="notes-input" rows="2" placeholder="备注（可选）"></textarea>
-                <button class="submit-btn" onclick="submitRecord()"><span id="submit-label">✅ 确认提交</span></button>
+                <button class="nav-btn" onclick="changeDate(1)">▶</button>
             </div>
         </div>
-        <div class="success-msg hidden" id="success-msg">
-            <div class="success-icon">✅</div>
-            <div id="success-text">签到成功！</div>
-            <button class="back-btn" onclick="resetForm()"><span id="back-label">返回</span></button>
+        <div class="summary-bar" id="summary-bar">
+            <span class="s-item"><span class="s-dot full"></span><span id="s-full">0</span> <span id="s-full-label">ມື້ເຕັມ</span></span>
+            <span class="s-item"><span class="s-dot half"></span><span id="s-half">0</span> <span id="s-half-label">ມື້ຄ້າງ</span></span>
+            <span class="s-item"><span class="s-dot absent"></span><span id="s-absent">0</span> <span id="s-absent-label">ບໍ່ມາ</span></span>
         </div>
-        <div class="history-section" id="history-section">
-            <h3 id="history-title">📋 今日签到记录</h3>
-            <div id="history-list"></div>
+        <div class="worker-list" id="worker-list"></div>
+        <div class="save-bar">
+            <button class="save-btn" id="save-btn" onclick="saveRecord()">
+                <span id="save-label">ບັນທຶກ</span>
+            </button>
         </div>
-        <div class="footer-links"><a href="admin.html" id="admin-link">📊 管理后台</a></div>
+        <div class="admin-link"><a href="admin.html" id="admin-link-text">📊 ແຜງຄວບຄຸມ</a></div>
     </div>
     <script src="config.js"></script>
     <script src="app.js"></script>
