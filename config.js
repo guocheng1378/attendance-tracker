@@ -5,7 +5,7 @@ const CONFIG={
         {id:2,name:'ມູ',nameZh:'姆'},
         {id:3,name:'ຣິມ',nameZh:'松'},
         {id:4,name:'ບາວ',nameZh:'巴'},
-        {id:5,name:'ຊົງ',nameZh:'棋'},
+        {id:5,name:'ຊົງ',nameZh:'恩'},
         {id:6,name:'ຈົງ',nameZh:'乐昂'},
         {id:7,name:'ເບີນ',nameZh:'文'},
         {id:8,name:'ຕົງ',nameZh:'米'},
