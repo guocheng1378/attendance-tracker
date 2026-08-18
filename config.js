@@ -1,5 +1,5 @@
 const CONFIG={
-    DEFAULT_LANG:'lo',
+    DEFAULT_LANG:'zh',
     EMPLOYEES:[
         {id:1,name:'ນາງ ສົມຫວ່າງ',nameZh:'小芳'},
         {id:2,name:'ທ່ານ ບຸນມາ',nameZh:'本马'},
