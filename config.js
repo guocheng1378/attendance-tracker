@@ -1,5 +1,7 @@
 const CONFIG={
     DEFAULT_LANG:'zh',
+    GIST_ID:'d9089c0a63dbfaaabd056ad42fd5b683',
+    GIST_FILE:'attendance.json',
     EMPLOYEES:[
         {id:1,name:'ໂອນ',nameZh:'盘'},
         {id:2,name:'ມູ',nameZh:'姆'},
@@ -15,6 +17,6 @@ const CONFIG={
         {id:12,name:'ມົວ',nameZh:'罗'}
     ],
     STATUS:{FULL:'full',HALF:'half',ABSENT:'absent'},
-    LO:{TITLE:'ບັນຊາການເຊັກອິນ',SUBTITLE:'ລາຍງານການເຂົ້າວຽກລາຍວັນ',FULL:'ມື້ເຕັມ',HALF:'ມື້ຄ້າງ',ABSENT:'ບໍ່ມາ',SAVE:'ບັນທຶກ',SAVED:'✅ ສຳເລັດ!',ADMIN:'📊 ແຜງຄວບຄຸມ',ADMIN_TITLE:'📊 ແຜງຄວບຄຸມ',ADMIN_SUB:'ສະຫຼຸບການເຊັກອິນລາຍເດືອນ',DETAIL:'ລາຍລະອຽດ',EXPORT:'📥 ສົ່ງອອກ CSV',BACK:'📋 ກັບໄປເຊັກອິນ',NO_DATA:'ຍັງບໍ່ມີຂໍ້ມູນ',TOTAL:'ລວມ',WORKERS:'ຄົນ'},
-    ZH:{TITLE:'考勤签到表',SUBTITLE:'每日出勤记录',FULL:'全天',HALF:'半天',ABSENT:'缺勤',SAVE:'保存记录',SAVED:'✅ 已保存!',ADMIN:'📊 管理后台',ADMIN_TITLE:'📊 管理后台',ADMIN_SUB:'月度考勤汇总',DETAIL:'详细信息',EXPORT:'📥 导出 CSV',BACK:'📋 返回签到',NO_DATA:'暂无数据',TOTAL:'共',WORKERS:'人'}
+    LO:{TITLE:'ບັນຊາການເຊັກອິນ',SUBTITLE:'ລາຍງານການເຂົ້າວຽກລາຍວັນ',FULL:'ມື້ເຕັມ',HALF:'ມື້ຄ້າງ',ABSENT:'ບໍ່ມາ',SAVE:'ບັນທຶກ',SAVED:'✅ ສຳເລັດ!',ADMIN:'📊 ແຜງຄວບຄຸມ',ADMIN_TITLE:'📊 ແຜງຄວບຄຸມ',ADMIN_SUB:'ສະຫຼຸບການເຊັກອິນລາຍເດືອນ',DETAIL:'ລາຍລະອຽດ',EXPORT:'📥 ສົ່ງອອກ CSV',BACK:'📋 ກັບໄປເຊັກອິນ',NO_DATA:'ຍັງບໍ່ມີຂໍ້ມູນ',TOTAL:'ລວມ',WORKERS:'ຄົນ',NO_TOKEN:'⚠️ ກະລຸນາຕັ້ງຄ່າ Token ກ່ອນ'},
+    ZH:{TITLE:'考勤签到表',SUBTITLE:'每日出勤记录',FULL:'全天',HALF:'半天',ABSENT:'缺勤',SAVE:'保存记录',SAVED:'✅ 已保存!',ADMIN:'📊 管理后台',ADMIN_TITLE:'📊 管理后台',ADMIN_SUB:'月度考勤汇总',DETAIL:'详细信息',EXPORT:'📥 导出 CSV',BACK:'📋 返回签到',NO_DATA:'暂无数据',TOTAL:'共',WORKERS:'人',NO_TOKEN:'⚠️ 请先设置 Token'}
 };
