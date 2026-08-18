@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>考勤追踪器 - Attendance Tracker</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        h1 { text-align: center; color: #333; margin-bottom: 30px; font-size: 24px; }
+        .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .card h2 { font-size: 18px; color: #333; margin-bottom: 16px; border-bottom: 2px solid #4CAF50; padding-bottom: 8px; }
+        .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 14px; color: #666; font-weight: 500; }
+        .form-group input, .form-group select { padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #4CAF50; }
+        textarea { width: 100%; min-height: 200px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; resize: vertical; font-family: inherit; line-height: 1.6; }
+        textarea:focus { outline: none; border-color: #4CAF50; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background: #4CAF50; color: white; }
+        .btn-primary:hover { background: #45a049; }
+        .btn-secondary { background: #607D8B; color: white; }
+        .btn-secondary:hover { background: #546E7A; }
+        .btn-group { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 14px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-weight: 600; color: #333; }
+        tr:hover { background: #f5f5f5; }
+        .status-ok { color: #4CAF50; font-weight: 500; }
+        .status-late { color: #f44336; font-weight: 500; }
+        .status-early { color: #ff9800; font-weight: 500; }
+        .status-absent { color: #9e9e9e; font-weight: 500; }
+        .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-top: 16px; }
+        .summary-item { text-align: center; padding: 16px; background: #f8f9fa; border-radius: 8px; }
+        .summary-item .number { font-size: 28px; font-weight: bold; color: #4CAF50; }
+        .summary-item .label { font-size: 12px; color: #666; margin-top: 4px; }
+        .hint { font-size: 13px; color: #888; margin-top: 8px; line-height: 1.5; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+        .tab { padding: 8px 16px; border-radius: 20px; background: #f0f0f0; cursor: pointer; font-size: 14px; }
+        .tab.active { background: #4CAF50; color: white; }
+        .hidden { display: none; }
+        @media (max-width: 600px) { .container { padding: 12px; } .card { padding: 16px; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 考勤追踪器</h1>
+
+        <div class="card">
+            <h2>⚙️ 设置</h2>
+            <div class="settings-grid">
+                <div class="form-group">
+                    <label>上班时间</label>
+                    <input type="time" id="workStart" value="08:00">
+                </div>
+                <div class="form-group">
+                    <label>下班时间</label>
+                    <input type="time" id="workEnd" value="17:00">
+                </div>
+                <div class="form-group">
+                    <label>迟到阈值（分钟）</label>
+                    <input type="number" id="lateThreshold" value="5" min="0">
+                </div>
+                <div class="form-group">
+                    <label>签到格式</label>
+                    <select id="format">
+                        <option value="auto">自动识别</option>
+                        <option value="签到 时间">签到 + 时间</option>
+                        <option value="名字 时间">名字 + 时间</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📝 输入签到记录</h2>
+            <textarea id="inputData" placeholder="粘贴 Messenger 群里的签到消息，每行一条，例如：&#10;张三 签到 08:02&#10;李四 签到 08:15&#10;王五 签到 07:58&#10;&#10;也支持：&#10;签到 张三 08:02&#10;张三 到了 08:00"></textarea>
+            <div class="hint">支持格式：名字+时间 / 签到+名字+时间 / 纯名字+时间（自动识别）</div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="parseData()">解析签到记录</button>
+                <button class="btn btn-secondary" onclick="clearAll()">清空</button>
+            </div>
+        </div>
+
+        <div class="card hidden" id="resultCard">
+            <h2>📊 考勤结果</h2>
+            <div class="summary" id="summary"></div>
+
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('table')">详细记录</div>
+                <div class="tab" onclick="showTab('csv')">导出CSV</div>
+            </div>
+
+            <div id="tableView">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>姓名</th>
+                            <th>签到时间</th>
+                            <th>状态</th>
+                            <th>迟到分钟</th>
+                            <th>备注</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultBody"></tbody>
+                </table>
+            </div>
+
+            <div id="csvView" class="hidden">
+                <textarea id="csvOutput" readonly style="min-height: 150px;"></textarea>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="copyCSV()">复制CSV</button>
+                    <button class="btn btn-secondary" onclick="downloadCSV()">下载CSV</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let parsedData = [];
+
+        function parseTime(str) {
+            str = str.trim();
+            let match = str.match(/(\d{1,2})[:\uff1a](\d{2})/);
+            if (match) return { h: parseInt(match[1]), m: parseInt(match[2]) };
+            match = str.match(/(\d{1,2})点(\d{1,2})/);
+            if (match) return { h: parseInt(match[1]), m: parseInt(match[2]) };
+            match = str.match(/^(\d{1,2})(\d{2})$/);
+            if (match) return { h: parseInt(match[1]), m: parseInt(match[2]) };
+            return null;
+        }
+
+        function timeToMinutes(t) { return t.h * 60 + t.m; }
+
+        function parseData() {
+            const input = document.getElementById('inputData').value.trim();
+            if (!input) return alert('请输入签到记录');
+
+            const workStart = document.getElementById('workStart').value;
+            const lateThreshold = parseInt(document.getElementById('lateThreshold').value);
+
+            const startParts = workStart.split(':');
+            const startMinutes = parseInt(startParts[0]) * 60 + parseInt(startParts[1]);
+
+            const lines = input.split('\n').filter(l => l.trim());
+            parsedData = [];
+
+            lines.forEach(line => {
+                line = line.trim();
+                let name = '', timeStr = '', time = null;
+
+                const patterns = [
+                    /^(.+?)\s*(签到|到了|到|d|D)\s*(\d{1,2}[:\uff1a:]\d{2}|\d{1,2}点\d{1,2}|\d{4})/,
+                    /^(签到|到了|到|d|D)\s*(.+?)\s*(\d{1,2}[:\uff1a:]\d{2}|\d{1,2}点\d{1,2}|\d{4})/,
+                    /^(.+?)\s*(\d{1,2}[:\uff1a:]\d{2}|\d{1,2}点\d{1,2}|\d{4})/,
+                ];
+
+                for (const p of patterns) {
+                    const m = line.match(p);
+                    if (m) {
+                        if (p === patterns[0]) { name = m[1]; timeStr = m[3]; }
+                        else if (p === patterns[1]) { name = m[2]; timeStr = m[3]; }
+                        else { name = m[1]; timeStr = m[2]; }
+                        time = parseTime(timeStr);
+                        break;
+                    }
+                }
+
+                if (name && time) {
+                    const arrival = timeToMinutes(time);
+                    const diff = arrival - startMinutes;
+                    const isLate = diff > lateThreshold;
+                    parsedData.push({
+                        name: name.trim(),
+                        time: `${String(time.h).padStart(2,'0')}:${String(time.m).padStart(2,'0')}`,
+                        status: isLate ? '迟到' : '正常',
+                        lateMinutes: isLate ? diff : 0,
+                        notes: isLate ? `迟到${diff}分钟` : '✓'
+                    });
+                }
+            });
+
+            if (parsedData.length === 0) {
+                alert('未能解析出有效记录，请检查格式');
+                return;
+            }
+
+            renderResults();
+        }
+
+        function renderResults() {
+            const card = document.getElementById('resultCard');
+            card.classList.remove('hidden');
+
+            const total = parsedData.length;
+            const late = parsedData.filter(d => d.status === '迟到').length;
+            const onTime = total - late;
+            document.getElementById('summary').innerHTML = `
+                <div class="summary-item"><div class="number">${total}</div><div class="label">总签到</div></div>
+                <div class="summary-item"><div class="number" style="color:#4CAF50">${onTime}</div><div class="label">正常</div></div>
+                <div class="summary-item"><div class="number" style="color:#f44336">${late}</div><div class="label">迟到</div></div>
+            `;
+
+            const tbody = document.getElementById('resultBody');
+            tbody.innerHTML = parsedData.map(d => `
+                <tr>
+                    <td>${d.name}</td>
+                    <td>${d.time}</td>
+                    <td class="${d.status === '迟到' ? 'status-late' : 'status-ok'}">${d.status}</td>
+                    <td>${d.lateMinutes || '-'}</td>
+                    <td>${d.notes}</td>
+                </tr>
+            `).join('');
+
+            let csv = '姓名,签到时间,状态,迟到分钟,备注\n';
+            parsedData.forEach(d => {
+                csv += `${d.name},${d.time},${d.status},${d.lateMinutes || 0},${d.notes}\n`;
+            });
+            document.getElementById('csvOutput').value = csv;
+        }
+
+        function showTab(tab) {
+            document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', (tab === 'table' && i === 0) || (tab === 'csv' && i === 1)));
+            document.getElementById('tableView').classList.toggle('hidden', tab !== 'table');
+            document.getElementById('csvView').classList.toggle('hidden', tab !== 'csv');
+        }
+
+        function copyCSV() {
+            const el = document.getElementById('csvOutput');
+            el.select();
+            document.execCommand('copy');
+            alert('CSV 已复制到剪贴板');
+        }
+
+        function downloadCSV() {
+            const csv = document.getElementById('csvOutput').value;
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `考勤记录_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+        }
+
+        function clearAll() {
+            document.getElementById('inputData').value = '';
+            document.getElementById('resultCard').classList.add('hidden');
+            parsedData = [];
+        }
+    </script>
+</body>
+</html>
