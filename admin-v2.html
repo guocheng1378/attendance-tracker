@@ -26,12 +26,25 @@ th,td{padding:10px 8px;text-align:center;font-size:13px;border-bottom:1px solid 
 th{background:#f9fafb;font-weight:600;color:#555}
 .nm{text-align:left;font-weight:600}
 .nm small{font-weight:400;color:#999}
-.ebtn{width:100%;padding:12px;background:#2563eb;color:white;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;margin:16px 0;font-family:sans-serif}
+.panel{background:white;border-radius:12px;padding:16px;margin:12px 0;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.panel h3{font-size:14px;margin-bottom:10px}
+.datepick{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.datepick label{font-size:12px;color:#888;white-space:nowrap}
+.datepick input[type=date]{flex:1;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
+.abtn{flex:1;min-width:0;padding:10px 8px;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:sans-serif;white-space:nowrap}
+.abtn.green{background:#dcfce7;color:#16a34a}
+.abtn.blue{background:#dbeafe;color:#2563eb}
+.abtn.purple{background:#ede9fe;color:#7c3aed}
+.abtn.orange{background:#ffedd5;color:#ea580c}
+.abtn.red{background:#fee2e2;color:#dc2626}
+.abtn.gray{background:#f3f4f6;color:#6b7280}
+.file-input{display:none}
+.sts{text-align:center;font-size:12px;color:#888;margin-top:8px;min-height:18px}
 .blk{text-align:center;padding:8px 0}
 .blk a{color:#2563eb;text-decoration:none;font-size:14px}
 .spinner{display:inline-block;width:12px;height:12px;border:2px solid #ddd;border-top-color:#2563eb;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.sts{text-align:center;font-size:12px;color:#888;margin-top:8px}
 </style>
 </head>
 <body>
@@ -40,31 +53,62 @@ th{background:#f9fafb;font-weight:600;color:#555}
 <div class="mnav"><button onclick="cm(-1)">◀</button><b id="ML"></b><button onclick="cm(1)">▶</button></div>
 <div class="mstats" id="MS"></div>
 <table><thead><tr id="TH"></tr></thead><tbody id="TB"></tbody></table>
-<button class="ebtn" id="EBTN" onclick="ec()"></button>
-<div class="blk"><a href="v2.html" id="BLNK"></a></div>
+
+<div class="panel" id="P1">
+<h3 id="P1T"></h3>
+<div class="datepick">
+<label id="LBL1"></label><input type="date" id="D1">
+<label id="LBL2"></label><input type="date" id="D2">
+</div>
+<div class="btn-row">
+<button class="abtn green" id="BEXP" onclick="expRange()"></button>
+<button class="abtn blue" id="BMON" onclick="expMonth()"></button>
+</div>
+</div>
+
+<div class="panel">
+<h3 id="P2T"></h3>
+<div class="btn-row">
+<button class="abtn purple" id="BBKP" onclick="bkpAll()"></button>
+<button class="abtn orange" id="BIMP" onclick="document.getElementById('FI').click()"></button>
+<button class="abtn red" id="BCLR" onclick="clrData()"></button>
+</div>
+<input type="file" class="file-input" id="FI" accept=".json" onchange="impFile(this)">
+</div>
+
 <div class="sts" id="ST"></div>
+<div class="blk"><a href="v2.html" id="BLNK"></a></div>
 <script>
 var REPO='guocheng1378/attendance-tracker',RAW='https://raw.githubusercontent.com/'+REPO+'/main/data.json';
 var E=[{id:1,n:'ໂອນ',z:'盘'},{id:2,n:'ມູ',z:'姆'},{id:3,n:'ຣິມ',z:'松'},{id:4,n:'ບາວ',z:'巴'},{id:5,n:'ຊົງ',z:'恩'},{id:6,n:'ຈົງ',z:'乐昂'},{id:7,n:'ເບີນ',z:'文'},{id:8,n:'ຕົງ',z:'米'},{id:9,n:'ຈົງ',z:'拽'},{id:10,n:'ກິນ',z:'春'},{id:11,n:'ຄົງ',z:'研'},{id:12,n:'ມົວ',z:'罗'}];
 var y,m,AR=[],lang='lo',allData=[];
 var TXT={
-lo:{title:'📊 ຫນ້າຈໍຄຸ້ມຄອງ',sub:'ລາຍງານການເຊັນເຂົ້າລາຍເດືອນ',records:'ບັນທຶກ',full:'ທັງມື້',half:'ປາກສາ',abs:'ບໍ່ມາ',colName:'ຊື່',colTotal:'ລວມ',exportBtn:'📥 ສົ່ງອອກ CSV',backBtn:'📋 ກັບຄືນໄປເຊັນເຂົ້າ',langBtn:'中文',yr:'ປີ',mo:'ເດືອນ',
-loading:'<span class="spinner"></span>ກຳລັງໂຫຼດ...',loaded:'✅ ໂຫຼດແລ້ວ',loadErr:'❌ ໂຫຼດລົ້ມເຫລວ, ຂໍ້ມູນໃນໂທລະສັບ'},
-zh:{title:'📊 管理后台',sub:'月度考勤汇总',records:'记录',full:'全天',half:'半天',abs:'缺勤',colName:'姓名',colTotal:'共',exportBtn:'📥 导出 CSV',backBtn:'📋 返回签到',langBtn:'LOA',yr:'年',mo:'月',
-loading:'<span class="spinner"></span>加载中...',loaded:'✅ 已加载',loadErr:'❌ 加载失败，使用手机本地数据'}
+lo:{title:'📊 ຫນ້າຈໍຄຸ້ມຄອງ',sub:'ລາຍງານການເຊັນເຂົ້າລາຍເດືອນ',records:'ບັນທຶກ',full:'ທັງມື້',half:'ປາກສາ',abs:'ບໍ່ມາ',colName:'ຊື່',colTotal:'ລວມ',langBtn:'中文',yr:'ປີ',mo:'ເດືອນ',backBtn:'📋 ກັບຄືນໄປເຊັນເຂົ້າ',
+title1:'📅 ສົ່ງອອກຕາມຊ່ວງວັນທີ່',lbl1:'ຈາກ:',lbl2:'ຫາ:',btnExport:'📥 ສົ່ງອອກ CSV',btnMonth:'📥 ສົ່ງອອກເດືອນນີ້',
+title2:'💾 ສຳຮອງຂໍ້ມູນ',btnBackup:'📦 ສຳຮອງທັງໝົດ (JSON)',btnImport:'📤 ນຳເຂົ້າສຳຮອງ',btnClear:'🗑️ ລຶບທັງໝົດ',
+loading:'<span class="spinner"></span>ກຳລັງໂຫຼດ...',ok:'✅ ສຳເລັດ',err:'❌ ມີຂໍ້ຜິດພາດ',confirmClr:'ຕ້ອງການລຶບຂໍ້ມູນທັງໝົດແທ້ບໍ?'},
+zh:{title:'📊 管理后台',sub:'月度考勤汇总',records:'记录',full:'全天',half:'半天',abs:'缺勤',colName:'姓名',colTotal:'共',langBtn:'LOA',yr:'年',mo:'月',backBtn:'📋 返回签到',
+title1:'📅 按时间导出',lbl1:'从:',lbl2:'到:',btnExport:'📥 导出CSV',btnMonth:'📥 导出本月',
+title2:'💾 数据备份',btnBackup:'📦 全量备份 (JSON)',btnImport:'📤 导入备份',btnClear:'🗑️ 清空数据',
+loading:'<span class="spinner"></span>加载中...',ok:'✅ 完成',err:'❌ 出错',confirmClr:'确定要清空所有数据吗？'}
 };
 function toggleLang(){lang=(lang==='lo')?'zh':'lo';localStorage.setItem('att_lang',lang);ui();render();}
 function ui(){var t=TXT[lang];document.getElementById('LB').textContent=t.langBtn;
-document.getElementById('HT').textContent=t.title;
-document.getElementById('HP').textContent=t.sub;
-document.getElementById('EBTN').textContent=t.exportBtn;
-document.getElementById('BLNK').textContent=t.backBtn;}
-function init(){var d=new Date();y=d.getFullYear();m=d.getMonth();}
-function cm(d){m+=d;if(m>11){m=0;y++;}if(m<0){m=11;y--;}render();}
+document.getElementById('HT').textContent=t.title;document.getElementById('HP').textContent=t.sub;
+document.getElementById('BLNK').textContent=t.backBtn;
+document.getElementById('P1T').textContent=t.title1;document.getElementById('LBL1').textContent=t.lbl1;document.getElementById('LBL2').textContent=t.lbl2;
+document.getElementById('BEXP').textContent=t.btnExport;document.getElementById('BMON').textContent=t.btnMonth;
+document.getElementById('P2T').textContent=t.title2;document.getElementById('BBKP').textContent=t.btnBackup;
+document.getElementById('BIMP').textContent=t.btnImport;document.getElementById('BCLR').textContent=t.btnClear;}
+function init(){var d=new Date();y=d.getFullYear();m=d.getMonth();var dd=new Date(y,m,1);var de=new Date(y,m+1,0);
+document.getElementById('D1').value=fmt(dd);document.getElementById('D2').value=fmt(de);}
+function fmt(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function cm(d){m+=d;if(m>11){m=0;y++;}if(m<0){m=11;y--;}var dd=new Date(y,m,1);var de=new Date(y,m+1,0);
+document.getElementById('D1').value=fmt(dd);document.getElementById('D2').value=fmt(de);render();}
 function render(){var t=TXT[lang];document.getElementById('ML').textContent=y+' '+t.mo+' '+(m+1);
-var ym=y+'-'+String(m+1).padStart(2,'0');
 var src=allData.length>0?allData:[];
 if(src.length===0){try{src=JSON.parse(localStorage.getItem('att2'));}catch(e){}if(!src)src=[];}
+var ym=y+'-'+String(m+1).padStart(2,'0');
 AR=src.filter(function(x){return x.d>=ym+'-01'&&x.d<=ym+'-31';});
 var ws={};E.forEach(function(e){ws[e.id]={n:e.n,z:e.z,f:0,h:0,a:0};});
 AR.forEach(function(r){if(r.w&&ws[r.w])ws[r.w][r.s]++;});
@@ -73,9 +117,27 @@ document.getElementById('MS').innerHTML='<div class="ms"><b>'+AR.length+'</b><sm
 document.getElementById('TH').innerHTML='<th>'+t.colName+'</th><th>✅ '+t.full+'</th><th>⚠️ '+t.half+'</th><th>❌ '+t.abs+'</th><th>'+t.colTotal+'</th>';
 var tb='';Object.values(ws).forEach(function(w){var tt=w.f*1+w.h*0.5;tb+='<tr><td class="nm">'+w.n+'<br><small>'+w.z+'</small></td><td>'+w.f+'</td><td>'+w.h+'</td><td>'+w.a+'</td><td>'+tt+'</td></tr>';});
 document.getElementById('TB').innerHTML=tb;}
-function ec(){var t=TXT[lang];var csv='\uFEFFວັນທີ່,ຊື່,ຊື່ຈີນ,ສະຖານະ\n';var sm={f:t.full,h:t.half,a:t.abs};AR.forEach(function(r){csv+=r.d+','+r.n+','+r.z+','+sm[r.s]+'\n';});var b=new Blob([csv],{type:'text/csv;charset=utf-8'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='attendance_'+y+'_'+String(m+1).padStart(2,'0')+'.csv';a.click();}
-function loadData(){var t=TXT[lang];var stEl=document.getElementById('ST');stEl.innerHTML=t.loading;
-fetch(RAW+'?t='+Date.now()).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(d){allData=d;stEl.innerHTML=t.loaded;render();}).catch(function(){allData=[];stEl.innerHTML=t.loadErr;render();});}
+function getSrc(){var s=allData.length>0?allData:[];if(s.length===0){try{s=JSON.parse(localStorage.getItem('att2'));}catch(e){}if(!s)s=[];}return s;}
+function expRange(){var t=TXT[lang];var d1=document.getElementById('D1').value;var d2=document.getElementById('D2').value;if(!d1||!d2)return;
+var s=getSrc().filter(function(x){return x.d>=d1&&x.d<=d2;});dlCSV(s,'attendance_'+d1+'_'+d2+'.csv',t);}
+function expMonth(){var t=TXT[lang];var ym=y+'-'+String(m+1).padStart(2,'0');
+var s=getSrc().filter(function(x){return x.d>=ym+'-01'&&x.d<=ym+'-31';});dlCSV(s,'attendance_'+ym+'.csv',t);}
+function dlCSV(data,name,t){if(data.length===0){alert('No data');return;}
+var sm={f:t.full,h:t.half,a:t.abs};
+var csv='\uFEFFວັນທີ່,ຊື່,ຊື່ຈີນ,ສະຖານະ\n';
+data.forEach(function(r){csv+=r.d+','+r.n+','+r.z+','+sm[r.s]+'\n';});
+var b=new Blob([csv],{type:'text/csv;charset=utf-8'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();}
+function bkpAll(){var s=getSrc();if(s.length===0){alert('No data');return;}
+var b=new Blob([JSON.stringify(s,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='attendance_backup_'+fmt(new Date())+'.json';a.click();}
+function impFile(el){var f=el.files[0];if(!f)return;var r=new FileReader();
+r.onload=function(e){try{var d=JSON.parse(e.target.result);if(!Array.isArray(d)){alert('Invalid');return;}
+var s=getSrc();var nd=s.concat(d);localStorage.setItem('att2',JSON.stringify(nd));allData=nd;render();
+var st=document.getElementById('ST');st.textContent=TXT[lang].ok+' ('+d.length+')';setTimeout(function(){st.textContent='';},3000);
+}catch(e){alert('Parse error');}};r.readAsText(f);el.value='';}
+function clrData(){if(!confirm(TXT[lang].confirmClr))return;
+localStorage.removeItem('att2');allData=[];render();document.getElementById('ST').textContent=TXT[lang].ok;}
+function loadData(){var t=TXT[lang];var st=document.getElementById('ST');st.innerHTML=t.loading;
+fetch(RAW+'?t='+Date.now()).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(d){allData=d;st.innerHTML=t.ok;render();}).catch(function(){st.innerHTML=t.loadErr||'';render();});}
 lang=localStorage.getItem('att_lang')||'lo';init();ui();loadData();
 </script>
 </body>
