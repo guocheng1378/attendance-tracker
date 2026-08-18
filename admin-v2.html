@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>管理后台</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:sans-serif;background:#f5f7fa;color:#333;max-width:480px;margin:0 auto;padding:16px}
+.hdr{text-align:center;padding:20px 0}
+.hdr h1{font-size:20px}
+.hdr p{font-size:13px;color:#888}
+.mnav{display:flex;align-items:center;justify-content:center;gap:16px;margin:16px 0}
+.mnav button{background:white;border:1px solid #ddd;border-radius:12px;width:40px;height:40px;font-size:18px;cursor:pointer}
+.mnav b{font-size:16px;min-width:100px;text-align:center}
+.mstats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.ms{background:white;border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.ms b{display:block;font-size:22px}
+.ms small{font-size:11px;color:#888}
+.ms.f b{color:#22c55e}
+.ms.h b{color:#f59e0b}
+.ms.a b{color:#ef4444}
+table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+th,td{padding:10px 8px;text-align:center;font-size:13px;border-bottom:1px solid #f0f0f0}
+th{background:#f9fafb;font-weight:600;color:#555}
+.nm{text-align:left;font-weight:600}
+.nm small{font-weight:400;color:#999}
+.ebtn{width:100%;padding:12px;background:#2563eb;color:white;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;margin:16px 0;font-family:sans-serif}
+.blk{text-align:center;padding:8px 0}
+.blk a{color:#2563eb;text-decoration:none;font-size:14px}
+</style>
+</head>
+<body>
+<div class="hdr"><h1>📊 管理后台</h1><p>月度考勤汇总</p></div>
+<div class="mnav"><button onclick="cm(-1)">◀</button><b id="ML"></b><button onclick="cm(1)">▶</button></div>
+<div class="mstats" id="MS"></div>
+<table><thead><tr id="TH"></tr></thead><tbody id="TB"></tbody></table>
+<button class="ebtn" onclick="ec()">📥 导出 CSV</button>
+<div class="blk"><a href="v2.html">📋 返回签到</a></div>
+<script>
+var E=[{id:1,n:'ໂອນ',z:'盘'},{id:2,n:'ມູ',z:'姆'},{id:3,n:'ຣິມ',z:'松'},{id:4,n:'ບາວ',z:'巴'},{id:5,n:'ຊົງ',z:'恩'},{id:6,n:'ຈົງ',z:'乐昂'},{id:7,n:'ເບີນ',z:'文'},{id:8,n:'ຕົງ',z:'米'},{id:9,n:'ຈົງ',z:'拽'},{id:10,n:'ກິນ',z:'春'},{id:11,n:'ຄົງ',z:'研'},{id:12,n:'ມົວ',z:'罗'}];
+var y,m,AR=[];
+function init(){var d=new Date();y=d.getFullYear();m=d.getMonth();la();}
+function cm(d){m+=d;if(m>11){m=0;y++;}if(m<0){m=11;y--;}la();}
+function la(){var ym=y+'-'+String(m+1).padStart(2,'0');var r=[];try{r=JSON.parse(localStorage.getItem('att2'));}catch(e){}if(!r)r=[];AR=r.filter(function(x){return x.d>=ym+'-01'&&x.d<=ym+'-31';});render();}
+function render(){var mn=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];document.getElementById('ML').textContent=mn[m]+' '+y;var ws={};E.forEach(function(e){ws[e.id]={n:e.n,z:e.z,f:0,h:0,a:0};});AR.forEach(function(r){if(r.w&&ws[r.w])ws[r.w][r.s]++;});var tf=0,th=0,ta=0;Object.values(ws).forEach(function(w){tf+=w.f;th+=w.h;ta+=w.a;});document.getElementById('MS').innerHTML='<div class="ms"><b>'+AR.length+'</b><small>记录</small></div><div class="ms f"><b>'+tf+'</b><small>全天</small></div><div class="ms h"><b>'+th+'</b><small>半天</small></div><div class="ms a"><b>'+ta+'</b><small>缺勤</small></div>';
+document.getElementById('TH').innerHTML='<th>姓名</th><th>✅ 全天</th><th>⚠️ 半天</th><th>❌ 缺勤</th><th>共</th>';
+var tb='';Object.values(ws).forEach(function(w){var t=w.f*1+w.h*0.5;tb+='<tr><td class="nm">'+w.n+'<br><small>'+w.z+'</small></td><td>'+w.f+'</td><td>'+w.h+'</td><td>'+w.a+'</td><td>'+t+'</td></tr>';});document.getElementById('TB').innerHTML=tb;}
+function ec(){var csv='\uFEFF日期,姓名,中文名,状态\n';var sm={f:'全天',h:'半天',a:'缺勤'};AR.forEach(function(r){csv+=r.d+','+r.n+','+r.z+','+sm[r.s]+'\n';});var b=new Blob([csv],{type:'text/csv;charset=utf-8'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='attendance_'+y+'_'+String(m+1).padStart(2,'0')+'.csv';a.click();}
+init();
+</script>
+</body>
+</html>
