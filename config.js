@@ -12,8 +12,7 @@ const CONFIG={
         {id:9,name:'ຈົງ',nameZh:'拽'},
         {id:10,name:'ກິນ',nameZh:'春'},
         {id:11,name:'ຄົງ',nameZh:'研'},
-        {id:12,name:'ວົງ',nameZh:'孙'},
-        {id:13,name:'ມົວ',nameZh:'罗'}
+        {id:12,name:'ມົວ',nameZh:'罗'}
     ],
     STATUS:{FULL:'full',HALF:'half',ABSENT:'absent'},
     LO:{TITLE:'ບັນຊາການເຊັກອິນ',SUBTITLE:'ລາຍງານການເຂົ້າວຽກລາຍວັນ',FULL:'ມື້ເຕັມ',HALF:'ມື້ຄ້າງ',ABSENT:'ບໍ່ມາ',SAVE:'ບັນທຶກ',SAVED:'✅ ສຳເລັດ!',ADMIN:'📊 ແຜງຄວບຄຸມ',ADMIN_TITLE:'📊 ແຜງຄວບຄຸມ',ADMIN_SUB:'ສະຫຼຸບການເຊັກອິນລາຍເດືອນ',DETAIL:'ລາຍລະອຽດ',EXPORT:'📥 ສົ່ງອອກ CSV',BACK:'📋 ກັບໄປເຊັກອິນ',NO_DATA:'ຍັງບໍ່ມີຂໍ້ມູນ',TOTAL:'ລວມ',WORKERS:'ຄົນ'},
