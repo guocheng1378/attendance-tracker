@@ -38,9 +38,11 @@ body{font-family:sans-serif;background:#f5f7fa;color:#333;max-width:480px;margin
 .stp input{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-bottom:8px;font-family:monospace}
 .stp button{width:100%;padding:10px;background:#22c55e;color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
 .stp .inf{font-size:11px;color:#888;margin-top:4px}
-.sts{text-align:center;font-size:12px;color:#888;margin-top:8px}
-.sts .ok{color:#22c55e}
-.sts .err{color:#ef4444}
+.sts{text-align:center;font-size:12px;color:#888;margin-top:8px;min-height:18px}
+.bkp{display:flex;gap:8px;margin-top:12px}
+.bkp button{flex:1;padding:10px;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:sans-serif}
+.bkp .gb{background:#dcfce7;color:#16a34a}
+.bkp .pb{background:#ede9fe;color:#7c3aed}
 .spinner{display:inline-block;width:12px;height:12px;border:2px solid #ddd;border-top-color:#2563eb;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
@@ -70,6 +72,11 @@ body{font-family:sans-serif;background:#f5f7fa;color:#333;max-width:480px;margin
 <input id="TI" type="password" placeholder="ghp_xxx...">
 <button id="TBTN" onclick="svt()"></button>
 <p class="inf" id="TINF"></p>
+<div class="bkp">
+<button class="gb" id="BBKP" onclick="bkpNow()"></button>
+<button class="pb" id="BIMP2" onclick="document.getElementById('FI2').click()"></button>
+<input type="file" id="FI2" accept=".json" style="display:none" onchange="impNow(this)">
+</div>
 </div>
 <script>
 var REPO='guocheng1378/attendance-tracker',URL='https://api.github.com/repos/'+REPO+'/contents/data.json',RAW='https://raw.githubusercontent.com/'+REPO+'/main/data.json';
@@ -77,24 +84,23 @@ var E=[{id:1,n:'ໂອນ',z:'盘'},{id:2,n:'ມູ',z:'姆'},{id:3,n:'ຣິມ
 var D=new Date(),SS={},dk,lang='lo',ghToken='',dataSHA='',allData=[];
 var TXT={
 lo:{title:'ຕາຕະລາງເຊັນເຂົ້າ',sub:'ບັນທຶກການເຂົ້າວຽກປະຈຳວັນ',full:'ທັງມື້',half:'ປາກສາ',abs:'ບໍ່ມາ',save:'ບັນທຶກ',saved:'✅ ຖືກບັນທຶກແລ້ວ!',empty:'ກະລຸນາເລືອກສະຖານະກ່ອນ',admin:'📊 ຫນ້າຈໍຄຸ້ມຄອງ',langBtn:'中文',
-tokLbl:'🔑 GitHub Token',tokBtn:'ບັນທຶກ Token',tokInf:'ເພີ່ທະບິນ GitHub Personal Access Token (repo) ເພື່ອບັນທຶກຂໍ້ມູນໃສ່ GitHub',
-syncing:'<span class="spinner"></span>ກຳລັງຊິງ...',synced:'✅ ຊິງແລ້ວ',syncErr:'❌ ຊິງລົ້ມເຫລວ',local:'📦 ບັນທຶກໃນໂທລະສັບ'},
+tokLbl:'🔑 GitHub Token',tokBtn:'ບັນທຶກ Token',tokInf:'ເພີ່ທະບິນ GitHub Token (repo) ເພື່ອຊິງຂໍ້ມູນ',
+syncing:'<span class="spinner"></span>ກຳລັງຊິງ...',synced:'✅ ຊິງແລ້ວ',syncErr:'❌ ຊິງລົ້ມເຫລວ',local:'📦 ບັນທຶກໃນໂທລະສັບ',
+btnBkp:'📦 ສຳຮອງ',btnImp:'📤 ນຳເຂົ້າ',ok:'✅ ສຳເລັດ'},
 zh:{title:'考勤签到表',sub:'每日出勤记录',full:'全天',half:'半天',abs:'缺勤',save:'保存记录',saved:'✅ 已保存!',empty:'请先选择考勤状态',admin:'📊 管理后台',langBtn:'LOA',
-tokLbl:'🔑 GitHub Token',tokBtn:'保存 Token',tokInf:'输入 GitHub Personal Access Token (repo权限) 以同步数据到 GitHub',
-syncing:'<span class="spinner"></span>同步中...',synced:'✅ 已同步',syncErr:'❌ 同步失败',local:'📦 仅保存在手机'}
+tokLbl:'🔑 GitHub Token',tokBtn:'保存 Token',tokInf:'输入 GitHub Token (repo权限) 以同步数据',
+syncing:'<span class="spinner"></span>同步中...',synced:'✅ 已同步',syncErr:'❌ 同步失败',local:'📦 仅保存在手机',
+btnBkp:'📦 备份',btnImp:'📤 导入',ok:'✅ 完成'}
 };
 function toggleLang(){lang=(lang==='lo')?'zh':'lo';localStorage.setItem('att_lang',lang);ui();rl();ls();}
 function ui(){var t=TXT[lang];document.getElementById('LB').textContent=t.langBtn;
 var h1=document.getElementById('T');if(h1)h1.textContent=t.title;
 var ps=document.getElementById('S');if(ps)ps.textContent=t.sub;
-document.getElementById('sfl').textContent=t.full;
-document.getElementById('shl').textContent=t.half;
-document.getElementById('sal').textContent=t.abs;
-document.getElementById('SBB').textContent=t.save;
-document.getElementById('ALNK').textContent=t.admin;
-document.getElementById('TLBL').textContent=t.tokLbl;
-document.getElementById('TBTN').textContent=t.tokBtn;
+document.getElementById('sfl').textContent=t.full;document.getElementById('shl').textContent=t.half;document.getElementById('sal').textContent=t.abs;
+document.getElementById('SBB').textContent=t.save;document.getElementById('ALNK').textContent=t.admin;
+document.getElementById('TLBL').textContent=t.tokLbl;document.getElementById('TBTN').textContent=t.tokBtn;
 document.getElementById('TINF').textContent=t.tokInf;
+document.getElementById('BBKP').textContent=t.btnBkp;document.getElementById('BIMP2').textContent=t.btnImp;
 if(ghToken)document.getElementById('TI').value=ghToken;}
 function fd(){return D.getFullYear()+'-'+String(D.getMonth()+1).padStart(2,'0')+'-'+String(D.getDate()).padStart(2,'0');}
 function rd(){var wd=lang==='lo'?'lo-LA':'zh-CN';document.getElementById('DD').textContent=D.toLocaleDateString(wd,{month:'long',day:'numeric'});document.getElementById('DW').textContent=D.toLocaleDateString(wd,{weekday:'long'});}
@@ -106,19 +112,17 @@ h+='<button class="sbtn" onclick="ss('+e.id+',\'a\',this,\'asel\')"><span class=
 h+='</div></div>';c.innerHTML+=h;});}
 function ss(id,st,b,cls){SS[id]=st;b.closest('.sbtns').querySelectorAll('.sbtn').forEach(function(x){x.className='sbtn';});b.className='sbtn '+cls;us();}
 function us(){var f=0,h=0,a=0;Object.values(SS).forEach(function(s){if(s==='f')f++;else if(s==='h')h++;else a++;});document.getElementById('sf').textContent=f;document.getElementById('sh').textContent=h;document.getElementById('sa').textContent=a;}
-function ls(){dk=fd();
-var src=allData.length>0?allData:[];
+function ls(){dk=fd();var src=allData.length>0?allData:[];
 if(src.length===0){try{src=JSON.parse(localStorage.getItem('att2'));}catch(e){}if(!src)src=[];}
 SS={};src.forEach(function(x){if(x.d===dk&&x.w&&x.s)SS[x.w]=x.s;});
 document.querySelectorAll('.wcard').forEach(function(c,i){var eid=E[i].id;var st=SS[eid];c.querySelectorAll('.sbtn').forEach(function(b){b.className='sbtn';});if(st){var map={f:0,h:1,a:2};var btn=c.querySelectorAll('.sbtn')[map[st]];if(btn){var cls={f:'sel',h:'hsel',a:'asel'};btn.className='sbtn '+cls[st];}}});us();}
+function getRec(){var r=[];try{r=JSON.parse(localStorage.getItem('att2'));}catch(e){}return r||[];}
 function sv(){dk=fd();var k=Object.keys(SS);var t=TXT[lang];if(k.length===0){alert(t.empty);return;}
-var localRec=[];try{localRec=JSON.parse(localStorage.getItem('att2'));}catch(e){}if(!localRec)localRec=[];
-localRec=localRec.filter(function(x){return x.d!==dk;});
+var localRec=getRec();localRec=localRec.filter(function(x){return x.d!==dk;});
 E.forEach(function(e){localRec.push({d:dk,w:e.id,n:e.n,z:e.z,s:SS[e.id]||'a',t:new Date().toISOString()});});
 localStorage.setItem('att2',JSON.stringify(localRec));
 if(!ghToken){allData=localRec;var b=document.getElementById('SBB');b.textContent=t.saved;b.className='svbtn done';document.getElementById('ST').innerHTML=t.local;setTimeout(function(){b.textContent=t.save;b.className='svbtn';document.getElementById('ST').innerHTML='';},2000);return;}
-allData=localRec;
-var stEl=document.getElementById('ST');stEl.innerHTML=t.syncing;
+allData=localRec;var stEl=document.getElementById('ST');stEl.innerHTML=t.syncing;
 ghSync(allData).then(function(r){if(r.ok){dataSHA=r.sha;stEl.innerHTML=t.synced;}else{stEl.innerHTML=t.syncErr;}}).catch(function(){stEl.innerHTML=t.syncErr;});
 var b=document.getElementById('SBB');b.textContent=t.saved;b.className='svbtn done';setTimeout(function(){b.textContent=t.save;b.className='svbtn';},2000);}
 function ghSync(data){var body=JSON.stringify(data,null,2);
@@ -127,6 +131,14 @@ function ghLoad(){if(!ghToken)return Promise.resolve();
 return fetch(RAW+'?t='+Date.now()).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(d){allData=d;return fetch(URL,{headers:{'Authorization':'token '+ghToken}});}).then(function(r){return r.json();}).then(function(f){dataSHA=f.sha;}).catch(function(){});}
 function svt(){ghToken=document.getElementById('TI').value.trim();if(ghToken){localStorage.setItem('att_gh_token',ghToken);}else{localStorage.removeItem('att_gh_token');ghToken='';}
 var stEl=document.getElementById('ST');stEl.innerHTML='<span class="spinner"></span>';ghLoad().then(function(){ls();stEl.innerHTML='';ui();});}
+function bkpNow(){var r=getRec();if(r.length===0){alert('No data');return;}
+var b=new Blob([JSON.stringify(r,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='attendance_backup_'+fd()+'.json';a.click();}
+function impNow(el){var f=el.files[0];if(!f)return;var r=new FileReader();
+r.onload=function(e){try{var d=JSON.parse(e.target.result);if(!Array.isArray(d)){alert('Invalid');return;}
+var s=getRec();s=s.concat(d);localStorage.setItem('att2',JSON.stringify(s));allData=s;ls();
+var st=document.getElementById('ST');st.textContent=TXT[lang].ok+' ('+d.length+')';setTimeout(function(){st.textContent='';},3000);
+if(ghToken){st.innerHTML='<span class="spinner"></span>';ghSync(s).then(function(r2){if(r2.ok)dataSHA=r2.sha;st.innerHTML='';});}
+}catch(e){alert('Parse error');}};r.readAsText(f);el.value='';}
 lang=localStorage.getItem('att_lang')||'lo';
 ghToken=localStorage.getItem('att_gh_token')||'';
 rd();ui();rl();
