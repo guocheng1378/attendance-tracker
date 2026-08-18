@@ -39,6 +39,11 @@ th{background:#f9fafb;font-weight:600;color:#555}
 .abtn.orange{background:#ffedd5;color:#ea580c}
 .abtn.red{background:#fee2e2;color:#dc2626}
 .abtn.cyan{background:#cffafe;color:#0891b2}
+.blist{margin-top:10px;max-height:250px;overflow-y:auto}
+.bitem{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#f9fafb;border-radius:8px;margin-bottom:4px;font-size:12px}
+.bitem span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bitem button{padding:4px 10px;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap}
+.bitem .rb{background:#dcfce7;color:#16a34a}
 .sts{text-align:center;font-size:12px;color:#888;margin-top:8px;min-height:18px}
 .blk{text-align:center;padding:8px 0}
 .blk a{color:#2563eb;text-decoration:none;font-size:14px}
@@ -66,28 +71,27 @@ th{background:#f9fafb;font-weight:600;color:#555}
 <div class="panel">
 <h3 id="P2T"></h3>
 <div class="btn-row">
-<button class="abtn purple" id="BBKP" onclick="bkpAll()"></button>
-<button class="abtn orange" id="BIMP" onclick="document.getElementById('FI').click()"></button>
+<button class="abtn purple" id="BBKP" onclick="backupGitHub()"></button>
+<button class="abtn orange" id="BLIST" onclick="listBackups()"></button>
 <button class="abtn red" id="BCLR" onclick="clrData()"></button>
-<button class="abtn cyan" id="BSYNC" onclick="pullGitHub()"></button>
 </div>
-<input type="file" class="file-input" id="FI" accept=".json" onchange="impFile(this)" style="display:none">
+<div class="blist" id="BLISTBOX" style="display:none"></div>
 </div>
 <div class="sts" id="ST"></div>
 <div class="blk"><a href="v2.html" id="BLNK"></a></div>
 <script>
-var REPO='guocheng1378/attendance-tracker',RAW='https://raw.githubusercontent.com/'+REPO+'/main/data.json';
+var REPO='guocheng1378/attendance-tracker',API='https://api.github.com/repos/'+REPO,RAW='https://raw.githubusercontent.com/'+REPO+'/main/';
 var E=[{id:1,n:'ໂອນ',z:'盘'},{id:2,n:'ມູ',z:'姆'},{id:3,n:'ຣິມ',z:'松'},{id:4,n:'ບາວ',z:'巴'},{id:5,n:'ຊົງ',z:'恩'},{id:6,n:'ຈົງ',z:'乐昂'},{id:7,n:'ເບີນ',z:'文'},{id:8,n:'ຕົງ',z:'米'},{id:9,n:'ຈົງ',z:'拽'},{id:10,n:'ກິນ',z:'春'},{id:11,n:'ຄົງ',z:'研'},{id:12,n:'ມົວ',z:'罗'}];
-var y,m,AR=[],lang='lo',allData=[];
+var y,m,AR=[],lang='lo',allData=[],ghToken='';
 var TXT={
-lo:{title:'📊 ຫນ້າຈໍຄຸ້ມຄອງ',sub:'ລາຍງານການເຊັນເຂົ້າລາຍເດືອນ',records:'ບັນທຶກ',full:'ທັງມື້',half:'ປາກສາ',abs:'ບໍ່ມາ',colName:'ຊື່',colTotal:'ລວມ',langBtn:'中文',yr:'ປີ',mo:'ເດືອນ',backBtn:'📋 ກັບຄືນໄປເຊັນເຂົ້າ',
-title1:'📅 ສົ່ງອອກຕາມຊ່ວງວັນທີ່',lbl1:'ຈາກ:',lbl2:'ຫາ:',btnExport:'📥 CSV',btnMonth:'📥 ເດືອນນີ້',
-title2:'💾 ຈັດການຂໍ້ມູນ',btnBackup:'📦 ສຳຮອງ',btnImport:'📤 ນຳເຂົ້າ',btnClear:'🗑️ ລຶບ',btnSync:'☁️ ດຶງຈາກ GitHub',
-loading:'<span class="spinner"></span>ກຳລັງໂຫຼດ...',ok:'✅ ສຳເລັດ',err:'❌ ມີຂໍ້ຜິດພາດ',confirmClr:'ຕ້ອງການລຶບທັງໝົດ?',pullOk:'✅ ດຶງແລ້ວ'},
-zh:{title:'📊 管理后台',sub:'月度考勤汇总',records:'记录',full:'全天',half:'半天',abs:'缺勤',colName:'姓名',colTotal:'共',langBtn:'LOA',yr:'年',mo:'月',backBtn:'📋 返回签到',
+lo:{title:'📊 ຫນ້າຈໍຄຸ້ມຄອງ',sub:'ລາຍງານການເຊັນເຂົ້າລາຍເດືອນ',records:'ບັນທຶກ',full:'ທັງມື້',half:'ປາກສາ',abs:'ບໍ່ມາ',colName:'ຊື່',colTotal:'ລວມ',langBtn:'中文',mo:'ເດືອນ',backBtn:'📋 ກັບຄືນ',
+title1:'📅 ສົ່ງອອກຕາມວັນ',lbl1:'ຈາກ:',lbl2:'ຫາ:',btnExport:'📥 CSV',btnMonth:'📥 ເດືອນນີ້',
+title2:'💾 ສຳຮອງ',btnBackup:'☁️ ສຳຮອງ',btnList:'📥 ເບິ່ງສຳຮອງ',btnClear:'🗑️ ລຶບ',
+loading:'<span class="spinner"></span>...',ok:'✅ ສຳເລັດ',err:'❌ ມີຂໍ້ຜິດພາດ',confirmClr:'ລຶບທັງໝົດ?',restore:'ກູ້ຄືນ',noBk:'ບໍ່ມີສຳຮອງ',confirmR:'ກູ້ຄືນສຳຮອງ?'},
+zh:{title:'📊 管理后台',sub:'月度考勤汇总',records:'记录',full:'全天',half:'半天',abs:'缺勤',colName:'姓名',colTotal:'共',langBtn:'LOA',mo:'月',backBtn:'📋 返回',
 title1:'📅 按时间导出',lbl1:'从:',lbl2:'到:',btnExport:'📥 导出CSV',btnMonth:'📥 导出本月',
-title2:'💾 数据管理',btnBackup:'📦 备份',btnImport:'📤 导入',btnClear:'🗑️ 清空',btnSync:'☁️ 从GitHub拉取',
-loading:'<span class="spinner"></span>加载中...',ok:'✅ 完成',err:'❌ 出错',confirmClr:'确定要清空所有数据吗？',pullOk:'✅ 已拉取'}
+title2:'💾 备份管理',btnBackup:'☁️ 备份到GitHub',btnList:'📥 查看备份',btnClear:'🗑️ 清空',
+loading:'<span class="spinner"></span>...',ok:'✅ 完成',err:'❌ 出错',confirmClr:'清空所有数据？',restore:'恢复',noBk:'暂无备份',confirmR:'恢复这个备份？'}
 };
 function toggleLang(){lang=(lang==='lo')?'zh':'lo';localStorage.setItem('att_lang',lang);ui();render();}
 function ui(){var t=TXT[lang];document.getElementById('LB').textContent=t.langBtn;
@@ -96,10 +100,9 @@ document.getElementById('BLNK').textContent=t.backBtn;
 document.getElementById('P1T').textContent=t.title1;document.getElementById('LBL1').textContent=t.lbl1;document.getElementById('LBL2').textContent=t.lbl2;
 document.getElementById('BEXP').textContent=t.btnExport;document.getElementById('BMON').textContent=t.btnMonth;
 document.getElementById('P2T').textContent=t.title2;document.getElementById('BBKP').textContent=t.btnBackup;
-document.getElementById('BIMP').textContent=t.btnImport;document.getElementById('BCLR').textContent=t.btnClear;
-document.getElementById('BSYNC').textContent=t.btnSync;}
+document.getElementById('BLIST').textContent=t.btnList;document.getElementById('BCLR').textContent=t.btnClear;}
 function init(){var d=new Date();y=d.getFullYear();m=d.getMonth();var dd=new Date(y,m,1);var de=new Date(y,m+1,0);
-document.getElementById('D1').value=fmt(dd);document.getElementById('D2').value=fmt(de);}
+document.getElementById('D1').value=fmt(dd);document.getElementById('D2').value=fmt(de);ghToken=localStorage.getItem('att_gh_token')||'';}
 function fmt(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function cm(d){m+=d;if(m>11){m=0;y++;}if(m<0){m=11;y--;}var dd=new Date(y,m,1);var de=new Date(y,m+1,0);
 document.getElementById('D1').value=fmt(dd);document.getElementById('D2').value=fmt(de);render();}
@@ -121,22 +124,39 @@ var s=getSrc().filter(function(x){return x.d>=d1&&x.d<=d2;});dlCSV(s,'attendance
 function expMonth(){var t=TXT[lang];var ym=y+'-'+String(m+1).padStart(2,'0');
 var s=getSrc().filter(function(x){return x.d>=ym+'-01'&&x.d<=ym+'-31';});dlCSV(s,'attendance_'+ym+'.csv',t);}
 function dlCSV(data,name,t){if(data.length===0){alert('No data');return;}
-var sm={f:t.full,h:t.half,a:t.abs};
-var csv='\uFEFFວັນທີ່,ຊື່,ຊື່ຈີນ,ສະຖານະ\n';
+var sm={f:t.full,h:t.half,a:t.abs};var csv='\uFEFFວັນທີ່,ຊື່,ຊື່ຈີນ,ສະຖານະ\n';
 data.forEach(function(r){csv+=r.d+','+r.n+','+r.z+','+sm[r.s]+'\n';});
 var b=new Blob([csv],{type:'text/csv;charset=utf-8'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();}
-function bkpAll(){var s=getSrc();if(s.length===0){alert('No data');return;}
-var b=new Blob([JSON.stringify(s,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='attendance_backup_'+fmt(new Date())+'.json';a.click();}
-function impFile(el){var f=el.files[0];if(!f)return;var r=new FileReader();
-r.onload=function(e){try{var d=JSON.parse(e.target.result);if(!Array.isArray(d)){alert('Invalid');return;}
-var s=getSrc().concat(d);localStorage.setItem('att2',JSON.stringify(s));allData=s;render();
-document.getElementById('ST').textContent=TXT[lang].ok+' ('+d.length+')';setTimeout(function(){document.getElementById('ST').textContent='';},3000);
-}catch(e){alert('Parse error');}};r.readAsText(f);el.value='';}
+function backupGitHub(){if(!ghToken){alert('请先在签到页输入Token');return;}
+var t=TXT[lang],st=document.getElementById('ST');st.innerHTML=t.loading;
+var data=getSrc();if(data.length===0){alert('No data');st.innerHTML='';return;}
+var now=new Date();var fn='backup/attendance-'+now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+'_'+String(now.getHours()).padStart(2,'0')+String(now.getMinutes()).padStart(2,'0')+'.json';
+var body=JSON.stringify(data,null,2);
+fetch(API+'/contents/'+fn,{method:'PUT',headers:{'Authorization':'token '+ghToken,'Content-Type':'application/json'},
+body:JSON.stringify({message:'backup '+fn.split('/')[1],content:btoa(unescape(encodeURIComponent(body))),branch:'main'})})
+.then(function(r){return r.json();}).then(function(d){if(d.content){st.innerHTML='✅ '+fn.split('/')[1];}else{st.innerHTML=t.err;}})
+.catch(function(){st.innerHTML=t.err;});}
+function listBackups(){if(!ghToken){alert('请先在签到页输入Token');return;}
+var t=TXT[lang],st=document.getElementById('ST'),box=document.getElementById('BLISTBOX');
+st.innerHTML=t.loading;
+fetch(API+'/contents/backup',{headers:{'Authorization':'token '+ghToken}})
+.then(function(r){return r.json();}).then(function(files){
+var jsons=files.filter(function(f){return f.name.endsWith('.json');}).sort().reverse();
+if(jsons.length===0){box.innerHTML='<div style="padding:8px;text-align:center;color:#888;font-size:12px">'+t.noBk+'</div>';box.style.display='block';st.innerHTML='';return;}
+var html='';jsons.forEach(function(f){var d=f.name.replace('attendance-','').replace('.json','');
+html+='<div class="bitem"><span>📅 '+d+'</span><button class="rb" onclick="restoreBackup(\''+f.name+'\')">'+t.restore+'</button></div>';});
+box.innerHTML=html;box.style.display='block';st.innerHTML='';})
+.catch(function(){st.innerHTML=t.err;});}
+function restoreBackup(name){if(!confirm(TXT[lang].confirmR))return;
+var t=TXT[lang],st=document.getElementById('ST');st.innerHTML=t.loading;
+fetch(RAW+'backup/'+name+'?t='+Date.now())
+.then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(data){
+localStorage.setItem('att2',JSON.stringify(data));allData=data;render();
+st.innerHTML='✅ '+data.length+' '+t.ok;setTimeout(function(){st.innerHTML='';},3000);})
+.catch(function(){st.innerHTML=t.err;});}
 function clrData(){if(!confirm(TXT[lang].confirmClr))return;
 localStorage.removeItem('att2');allData=[];render();document.getElementById('ST').textContent=TXT[lang].ok;}
-function pullGitHub(){var t=TXT[lang];var st=document.getElementById('ST');st.innerHTML=t.loading;
-fetch(RAW+'?t='+Date.now()).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(d){allData=d;localStorage.setItem('att2',JSON.stringify(d));render();st.textContent=t.pullOk;setTimeout(function(){st.textContent='';},2000);}).catch(function(){st.textContent=t.err;});}
-lang=localStorage.getItem('att_lang')||'lo';init();ui();pullGitHub();
+init();ui();render();
 </script>
 </body>
 </html>
