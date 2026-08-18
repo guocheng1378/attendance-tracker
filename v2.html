@@ -39,7 +39,11 @@ body{font-family:sans-serif;background:#f5f7fa;color:#333;max-width:480px;margin
 .stp button{width:100%;padding:10px;background:#22c55e;color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
 .stp .inf{font-size:11px;color:#888;margin-top:4px}
 .sts{text-align:center;font-size:12px;color:#888;margin-top:8px;min-height:18px}
-.bkp{display:flex;gap:8px;margin-top:12px}
+.cloud{display:flex;gap:8px;margin-top:10px}
+.cloud button{flex:1;padding:10px;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:sans-serif}
+.cloud .up{background:#dbeafe;color:#2563eb}
+.cloud .dn{background:#fef3c7;color:#d97706}
+.bkp{display:flex;gap:8px;margin-top:10px}
 .bkp button{flex:1;padding:10px;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:sans-serif}
 .bkp .gb{background:#dcfce7;color:#16a34a}
 .bkp .pb{background:#ede9fe;color:#7c3aed}
@@ -49,10 +53,7 @@ body{font-family:sans-serif;background:#f5f7fa;color:#333;max-width:480px;margin
 </head>
 <body>
 <button class="lang" id="LB" onclick="toggleLang()">中文</button>
-<div class="hdr">
-<h1 id="T"></h1>
-<p id="S"></p>
-</div>
+<div class="hdr"><h1 id="T"></h1><p id="S"></p></div>
 <div class="dnav">
 <button onclick="cd(-1)">◀</button>
 <div class="dtxt"><b id="DD"></b><small id="DW"></small></div>
@@ -72,6 +73,10 @@ body{font-family:sans-serif;background:#f5f7fa;color:#333;max-width:480px;margin
 <input id="TI" type="password" placeholder="ghp_xxx...">
 <button id="TBTN" onclick="svt()"></button>
 <p class="inf" id="TINF"></p>
+<div class="cloud">
+<button class="up" id="BPUSH" onclick="syncAll()"></button>
+<button class="dn" id="BPULL" onclick="pullAll()"></button>
+</div>
 <div class="bkp">
 <button class="gb" id="BBKP" onclick="bkpNow()"></button>
 <button class="pb" id="BIMP2" onclick="document.getElementById('FI2').click()"></button>
@@ -84,13 +89,15 @@ var E=[{id:1,n:'ໂອນ',z:'盘'},{id:2,n:'ມູ',z:'姆'},{id:3,n:'ຣິມ
 var D=new Date(),SS={},dk,lang='lo',ghToken='',dataSHA='',allData=[];
 var TXT={
 lo:{title:'ຕາຕະລາງເຊັນເຂົ້າ',sub:'ບັນທຶກການເຂົ້າວຽກປະຈຳວັນ',full:'ທັງມື້',half:'ປາກສາ',abs:'ບໍ່ມາ',save:'ບັນທຶກ',saved:'✅ ຖືກບັນທຶກແລ້ວ!',empty:'ກະລຸນາເລືອກສະຖານະກ່ອນ',admin:'📊 ຫນ້າຈໍຄຸ້ມຄອງ',langBtn:'中文',
-tokLbl:'🔑 GitHub Token',tokBtn:'ບັນທຶກ Token',tokInf:'ເພີ່ທະບິນ GitHub Token (repo) ເພື່ອຊິງຂໍ້ມູນ',
-syncing:'<span class="spinner"></span>ກຳລັງຊິງ...',synced:'✅ ຊິງແລ້ວ',syncErr:'❌ ຊິງລົ້ມເຫລວ',local:'📦 ບັນທຶກໃນໂທລະສັບ',
-btnBkp:'📦 ສຳຮອງ',btnImp:'📤 ນຳເຂົ້າ',ok:'✅ ສຳເລັດ'},
+tokLbl:'🔑 GitHub Token',tokBtn:'ບັນທຶກ Token',tokInf:'ຕື່ມ GitHub Token (repo) ເພື່ອຊິງຂໍ້ມູນ',
+syncing:'<span class="spinner"></span>ກຳລັງຊິງ...',synced:'✅ ຊິງແລ້ວ',syncErr:'❌ ຊິງລົ້ມ',local:'📦 ບັນທຶກໃນໂທລະສັບ',
+btnPush:'☁️ ຊິນຂຶ້ນ GitHub',btnPull:'📥 ດຶງຈາກ GitHub',
+btnBkp:'📦 ສຳຮອງ',btnImp:'📤 ນຳເຂົ້າ',ok:'✅ ສຳເລັດ',pushOk:'✅ ຊິນແລ້ວ',pullOk:'✅ ດຶງແລ້ວ'},
 zh:{title:'考勤签到表',sub:'每日出勤记录',full:'全天',half:'半天',abs:'缺勤',save:'保存记录',saved:'✅ 已保存!',empty:'请先选择考勤状态',admin:'📊 管理后台',langBtn:'LOA',
-tokLbl:'🔑 GitHub Token',tokBtn:'保存 Token',tokInf:'输入 GitHub Token (repo权限) 以同步数据',
+tokLbl:'🔑 GitHub Token',tokBtn:'保存 Token',tokInf:'输入 GitHub Token (repo)',
 syncing:'<span class="spinner"></span>同步中...',synced:'✅ 已同步',syncErr:'❌ 同步失败',local:'📦 仅保存在手机',
-btnBkp:'📦 备份',btnImp:'📤 导入',ok:'✅ 完成'}
+btnPush:'☁️ 推送到 GitHub',btnPull:'📥 从 GitHub 拉取',
+btnBkp:'📦 备份',btnImp:'📤 导入',ok:'✅ 完成',pushOk:'✅ 已推送',pullOk:'✅ 已拉取'}
 };
 function toggleLang(){lang=(lang==='lo')?'zh':'lo';localStorage.setItem('att_lang',lang);ui();rl();ls();}
 function ui(){var t=TXT[lang];document.getElementById('LB').textContent=t.langBtn;
@@ -100,6 +107,7 @@ document.getElementById('sfl').textContent=t.full;document.getElementById('shl')
 document.getElementById('SBB').textContent=t.save;document.getElementById('ALNK').textContent=t.admin;
 document.getElementById('TLBL').textContent=t.tokLbl;document.getElementById('TBTN').textContent=t.tokBtn;
 document.getElementById('TINF').textContent=t.tokInf;
+document.getElementById('BPUSH').textContent=t.btnPush;document.getElementById('BPULL').textContent=t.btnPull;
 document.getElementById('BBKP').textContent=t.btnBkp;document.getElementById('BIMP2').textContent=t.btnImp;
 if(ghToken)document.getElementById('TI').value=ghToken;}
 function fd(){return D.getFullYear()+'-'+String(D.getMonth()+1).padStart(2,'0')+'-'+String(D.getDate()).padStart(2,'0');}
@@ -126,16 +134,22 @@ allData=localRec;var stEl=document.getElementById('ST');stEl.innerHTML=t.syncing
 ghSync(allData).then(function(r){if(r.ok){dataSHA=r.sha;stEl.innerHTML=t.synced;}else{stEl.innerHTML=t.syncErr;}}).catch(function(){stEl.innerHTML=t.syncErr;});
 var b=document.getElementById('SBB');b.textContent=t.saved;b.className='svbtn done';setTimeout(function(){b.textContent=t.save;b.className='svbtn';},2000);}
 function ghSync(data){var body=JSON.stringify(data,null,2);
-return fetch(URL).then(function(r){return r.json();}).then(function(f){dataSHA=f.sha;return fetch(URL,{method:'PUT',headers:{'Authorization':'token '+ghToken,'Content-Type':'application/json'},body:JSON.stringify({message:'update attendance '+dk,content:btoa(unescape(encodeURIComponent(body))),sha:f.sha,branch:'main'})});}).then(function(r){return r.json();}).then(function(d){return{ok:true,sha:d.content?d.content.sha:dataSHA};}).catch(function(){return{ok:false};});}
+return fetch(URL).then(function(r){return r.json();}).then(function(f){dataSHA=f.sha;return fetch(URL,{method:'PUT',headers:{'Authorization':'token '+ghToken,'Content-Type':'application/json'},body:JSON.stringify({message:'sync '+new Date().toISOString().slice(0,10),content:btoa(unescape(encodeURIComponent(body))),sha:f.sha,branch:'main'})});}).then(function(r){return r.json();}).then(function(d){return{ok:true,sha:d.content?d.content.sha:dataSHA};}).catch(function(){return{ok:false};});}
 function ghLoad(){if(!ghToken)return Promise.resolve();
-return fetch(RAW+'?t='+Date.now()).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(d){allData=d;return fetch(URL,{headers:{'Authorization':'token '+ghToken}});}).then(function(r){return r.json();}).then(function(f){dataSHA=f.sha;}).catch(function(){});}
+return fetch(RAW+'?t='+Date.now()).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(d){allData=d;localStorage.setItem('att2',JSON.stringify(d));return fetch(URL,{headers:{'Authorization':'token '+ghToken}});}).then(function(r){return r.json();}).then(function(f){dataSHA=f.sha;}).catch(function(){});}
 function svt(){ghToken=document.getElementById('TI').value.trim();if(ghToken){localStorage.setItem('att_gh_token',ghToken);}else{localStorage.removeItem('att_gh_token');ghToken='';}
 var stEl=document.getElementById('ST');stEl.innerHTML='<span class="spinner"></span>';ghLoad().then(function(){ls();stEl.innerHTML='';ui();});}
+function syncAll(){if(!ghToken){alert('请先输入 Token');return;}
+var t=TXT[lang];var stEl=document.getElementById('ST');stEl.innerHTML=t.syncing;
+ghSync(getRec()).then(function(r){if(r.ok){dataSHA=r.sha;stEl.innerHTML=t.pushOk;}else{stEl.innerHTML=t.syncErr;}}).catch(function(){stEl.innerHTML=t.syncErr;});}
+function pullAll(){if(!ghToken){alert('请先输入 Token');return;}
+var t=TXT[lang];var stEl=document.getElementById('ST');stEl.innerHTML=t.syncing;
+ghLoad().then(function(){ls();stEl.innerHTML=t.pullOk;setTimeout(function(){stEl.innerHTML='';},2000);});}
 function bkpNow(){var r=getRec();if(r.length===0){alert('No data');return;}
-var b=new Blob([JSON.stringify(r,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='attendance_backup_'+fd()+'.json';a.click();}
+var b=new Blob([JSON.stringify(r,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='attendance_'+fd()+'.json';a.click();}
 function impNow(el){var f=el.files[0];if(!f)return;var r=new FileReader();
 r.onload=function(e){try{var d=JSON.parse(e.target.result);if(!Array.isArray(d)){alert('Invalid');return;}
-var s=getRec();s=s.concat(d);localStorage.setItem('att2',JSON.stringify(s));allData=s;ls();
+var s=getRec().concat(d);localStorage.setItem('att2',JSON.stringify(s));allData=s;ls();
 var st=document.getElementById('ST');st.textContent=TXT[lang].ok+' ('+d.length+')';setTimeout(function(){st.textContent='';},3000);
 if(ghToken){st.innerHTML='<span class="spinner"></span>';ghSync(s).then(function(r2){if(r2.ok)dataSHA=r2.sha;st.innerHTML='';});}
 }catch(e){alert('Parse error');}};r.readAsText(f);el.value='';}
