@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="lo">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>考勤签到</title>
+<title>ຕາຕະລາງເຊັນເຂົ້າ</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:sans-serif;background:#f5f7fa;color:#333;max-width:480px;margin:0 auto;padding:16px}
@@ -36,8 +36,8 @@ body{font-family:sans-serif;background:#f5f7fa;color:#333;max-width:480px;margin
 </head>
 <body>
 <div class="hdr">
-<h1 id="T">考勤签到表</h1>
-<p id="S">每日出勤记录</p>
+<h1 id="T">ຕາຕະລາງເຊັນເຂົ້າ</h1>
+<p id="S">ບັນທຶກການເຂົ້າວຽກປະຈຳວັນ</p>
 </div>
 <div class="dnav">
 <button onclick="cd(-1)">◀</button>
@@ -45,29 +45,29 @@ body{font-family:sans-serif;background:#f5f7fa;color:#333;max-width:480px;margin
 <button onclick="cd(1)">▶</button>
 </div>
 <div class="sbar">
-<span>✅ 全天 <b id="sf">0</b></span>
-<span>⚠️ 半天 <b id="sh">0</b></span>
-<span>❌ 缺勤 <b id="sa">0</b></span>
+<span>✅ ທັງມື້ <b id="sf">0</b></span>
+<span>⚠️ ປາກສາ <b id="sh">0</b></span>
+<span>❌ ບໍ່ມາ <b id="sa">0</b></span>
 </div>
 <div class="wlist" id="WL"></div>
-<div class="svbar"><button class="svbtn" id="SB" onclick="sv()">保存记录</button></div>
-<div class="alnk"><a href="admin-v2.html">📊 管理后台</a></div>
+<div class="svbar"><button class="svbtn" id="SB" onclick="sv()">ບັນທຶກ</button></div>
+<div class="alnk"><a href="admin-v2.html">📊 ຫນ້າຈໍຄຸ້ມຄອງ</a></div>
 <script>
 var E=[{id:1,n:'ໂອນ',z:'盘'},{id:2,n:'ມູ',z:'姆'},{id:3,n:'ຣິມ',z:'松'},{id:4,n:'ບາວ',z:'巴'},{id:5,n:'ຊົງ',z:'恩'},{id:6,n:'ຈົງ',z:'乐昂'},{id:7,n:'ເບີນ',z:'文'},{id:8,n:'ຕົງ',z:'米'},{id:9,n:'ຈົງ',z:'拽'},{id:10,n:'ກິນ',z:'春'},{id:11,n:'ຄົງ',z:'研'},{id:12,n:'ມົວ',z:'罗'}];
 var D=new Date(),SS={},dk;
 function fd(){return D.getFullYear()+'-'+String(D.getMonth()+1).padStart(2,'0')+'-'+String(D.getDate()).padStart(2,'0');}
-function rd(){document.getElementById('DD').textContent=D.toLocaleDateString('zh-CN',{month:'long',day:'numeric'});document.getElementById('DW').textContent=D.toLocaleDateString('zh-CN',{weekday:'long'});}
+function rd(){document.getElementById('DD').textContent=D.toLocaleDateString('lo-LA',{month:'long',day:'numeric'});document.getElementById('DW').textContent=D.toLocaleDateString('lo-LA',{weekday:'long'});}
 function cd(d){D.setDate(D.getDate()+d);rd();ls();us();}
-function rl(){var c=document.getElementById('WL');c.innerHTML='';E.forEach(function(e){var h='<div class="wcard"><div class="wname">'+e.n+'<small>'+e.z+'</small></div><div class="sbtns">';h+='<button class="sbtn" onclick="ss('+e.id+',\'f\',this,\'sel\')"><span class="si">✅</span><span>全天</span></button>';h+='<button class="sbtn" onclick="ss('+e.id+',\'h\',this,\'hsel\')"><span class="si">⚠️</span><span>半天</span></button>';h+='<button class="sbtn" onclick="ss('+e.id+',\'a\',this,\'asel\')"><span class="si">❌</span><span>缺勤</span></button>';h+='</div></div>';c.innerHTML+=h;});}
+function rl(){var c=document.getElementById('WL');c.innerHTML='';E.forEach(function(e){var h='<div class="wcard"><div class="wname">'+e.n+'<small>'+e.z+'</small></div><div class="sbtns">';h+='<button class="sbtn" onclick="ss('+e.id+',\'f\',this,\'sel\')"><span class="si">✅</span><span>ທັງມື້</span></button>';h+='<button class="sbtn" onclick="ss('+e.id+',\'h\',this,\'hsel\')"><span class="si">⚠️</span><span>ປາກສາ</span></button>';h+='<button class="sbtn" onclick="ss('+e.id+',\'a\',this,\'asel\')"><span class="si">❌</span><span>ບໍ່ມາ</span></button>';h+='</div></div>';c.innerHTML+=h;});}
 function ss(id,st,b,cls){SS[id]=st;b.closest('.sbtns').querySelectorAll('.sbtn').forEach(function(x){x.className='sbtn';});b.className='sbtn '+cls;us();}
 function us(){var f=0,h=0,a=0;Object.values(SS).forEach(function(s){if(s==='f')f++;else if(s==='h')h++;else a++;});document.getElementById('sf').textContent=f;document.getElementById('sh').textContent=h;document.getElementById('sa').textContent=a;}
 function ls(){dk=fd();var r=[];try{r=JSON.parse(localStorage.getItem('att2'));}catch(e){}if(!r)r=[];SS={};r.forEach(function(x){if(x.d===dk&&x.w&&x.s)SS[x.w]=x.s;});document.querySelectorAll('.wcard').forEach(function(c,i){var eid=E[i].id;var st=SS[eid];c.querySelectorAll('.sbtn').forEach(function(b){b.className='sbtn';});if(st){var map={f:0,h:1,a:2};var btn=c.querySelectorAll('.sbtn')[map[st]];if(btn){var cls={f:'sel',h:'hsel',a:'asel'};btn.className='sbtn '+cls[st];}}});us();}
-function sv(){dk=fd();var k=Object.keys(SS);if(k.length===0){alert('请先选择考勤状态');return;}var rec=[];try{rec=JSON.parse(localStorage.getItem('att2'));}catch(e){}if(!rec)rec=[];
+function sv(){dk=fd();var k=Object.keys(SS);if(k.length===0){alert('ກະລຸນາເລືອກສະຖານະກ່ອນ');return;}var rec=[];try{rec=JSON.parse(localStorage.getItem('att2'));}catch(e){}if(!rec)rec=[];
 rec=rec.filter(function(x){return x.d!==dk;});
 E.forEach(function(e){rec.push({d:dk,w:e.id,n:e.n,z:e.z,s:SS[e.id]||'a',t:new Date().toISOString()});});
 localStorage.setItem('att2',JSON.stringify(rec));
-var b=document.getElementById('SB');b.textContent='✅ 已保存!';b.className='svbtn done';
-setTimeout(function(){b.textContent='保存记录';b.className='svbtn';},2000);}
+var b=document.getElementById('SB');b.textContent='✅ ຖືກບັນທຶກແລ້ວ!';b.className='svbtn done';
+setTimeout(function(){b.textContent='ບັນທຶກ';b.className='svbtn';},2000);}
 rd();rl();ls();us();
 </script>
 </body>
