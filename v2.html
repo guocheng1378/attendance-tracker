@@ -18,150 +18,99 @@ body{font-family:sans-serif;background:#f5f7fa;color:#333;max-width:480px;margin
 .dnav .dtxt small{color:#2563eb;font-size:12px}
 .sbar{display:flex;justify-content:space-around;background:white;border-radius:12px;padding:12px;margin:12px 0;box-shadow:0 1px 4px rgba(0,0,0,.06)}
 .sbar span{font-size:13px;font-weight:600}
-.wlist{display:flex;flex-direction:column;gap:8px}
-.wcard{background:white;border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.wname{font-size:18px;font-weight:600}
-.wname small{font-size:13px;color:#999;font-weight:400;margin-left:8px}
-.sbtns{display:flex;gap:6px}
-.sbtn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 10px;border:2px solid #e5e7eb;border-radius:10px;background:white;cursor:pointer;font-size:11px;font-family:sans-serif}
-.sbtn .si{font-size:16px}
-.sbtn.sel{background:#f0fdf4;border-color:#22c55e}
-.sbtn.hsel{background:#fffbeb;border-color:#f59e0b}
-.sbtn.asel{background:#fef2f2;border-color:#ef4444}
-.svbar{padding:16px 0;position:sticky;bottom:0;background:linear-gradient(transparent,#f5f7fa 20%)}
-.svbtn{width:100%;padding:14px;background:#2563eb;color:white;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;font-family:sans-serif}
-.svbtn.done{background:#22c55e}
-.alnk{text-align:center;padding:8px 0}
-.alnk a{color:#2563eb;text-decoration:none;font-size:14px}
-.stp{margin-top:8px;padding:16px;background:white;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.stp label{font-size:13px;font-weight:600;display:block;margin-bottom:6px}
-.stp input{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-bottom:8px;font-family:monospace}
-.stp button{width:100%;padding:10px;background:#22c55e;color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
-.stp .inf{font-size:11px;color:#888;margin-top:4px}
-.sts{text-align:center;font-size:12px;color:#888;margin-top:8px;min-height:18px}
-.bbtn{display:flex;gap:8px;margin-top:10px}
-.bbtn button{flex:1;padding:10px;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:sans-serif}
-.bbtn .gb{background:#dbeafe;color:#2563eb}
-.bbtn .pb{background:#ede9fe;color:#7c3aed}
-.bbtn .db{background:#ffedd5;color:#ea580c}
-.blist{margin-top:10px;max-height:200px;overflow-y:auto}
-.bitem{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#f9fafb;border-radius:8px;margin-bottom:4px;font-size:12px}
-.bitem span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bitem button{padding:4px 10px;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap}
-.bitem .rb{background:#dcfce7;color:#16a34a}
-.spinner{display:inline-block;width:12px;height:12px;border:2px solid #ddd;border-top-color:#2563eb;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
-@keyframes spin{to{transform:rotate(360deg)}}
+.wlist{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.witem{display:flex;align-items:center;background:white;border-radius:12px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);cursor:pointer;transition:all .2s}
+.witem:active{transform:scale(.98);background:#f0f7ff}
+.witem .wi{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;margin-right:12px}
+.witem .wn{flex:1}
+.witem .wn b{display:block;font-size:15px}
+.witem .wn small{color:#888;font-size:12px}
+.witem .ws{text-align:right}
+.witem .ws b{display:block;font-size:18px}
+.witem .ws small{font-size:11px;color:#888}
+.sn{background:#e8f5e9}
+.sa{background:#fff3e0}
+.sh{background:#e3f2fd}
+.st{background:#f5f5f5}
+.abtn{display:flex;gap:8px;margin:16px 0;flex-wrap:wrap;justify-content:center}
+.abtn button{flex:1;min-width:100px;padding:12px;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer}
+.abtn .g{background:#22c55e;color:white}
+.abtn .b{background:#3b82f6;color:white}
+.abtn .o{background:#f59e0b;color:white}
+.abtn .r{background:#ef4444;color:white}
+.abtn .d{background:#6b7280;color:white}
+.sts{position:fixed;bottom:0;left:0;right:0;background:white;padding:8px 16px;font-size:12px;color:#888;text-align:center;border-top:1px solid #eee;max-width:480px;margin:0 auto;z-index:10}
+.modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:100;justify-content:center;align-items:center}
+.modal.show{display:flex}
+.modal .box{background:white;border-radius:16px;padding:20px;width:90%;max-width:360px}
+.modal h3{margin-bottom:12px;font-size:16px}
+.modal .fitem{display:flex;align-items:center;padding:10px;border-radius:8px;cursor:pointer}
+.modal .fitem:active{background:#f0f7ff}
+.modal .fitem .fi{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;margin-right:10px}
+.modal .fitem .fn{font-weight:600;font-size:14px}
+.modal .close{margin-top:12px;width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;background:white;font-size:14px;cursor:pointer}
 </style>
 </head>
 <body>
-<button class="lang" id="LB" onclick="toggleLang()">中文</button>
-<div class="hdr"><h1 id="T"></h1><p id="S"></p></div>
-<div class="dnav">
-<button onclick="cd(-1)">◀</button>
-<div class="dtxt"><b id="DD"></b><small id="DW"></small></div>
-<button onclick="cd(1)">▶</button>
-</div>
-<div class="sbar">
-<span>✅ <span id="sfl"></span> <b id="sf">0</b></span>
-<span>⚠️ <span id="shl"></span> <b id="sh">0</b></span>
-<span>❌ <span id="sal"></span> <b id="sa">0</b></span>
-</div>
+<div class="hdr"><h1 id="T1">📋 ຕາຕະລາງເຊັນເຂົ້າ</h1><p id="T2"></p></div>
+<button class="lang" onclick="tgLang()" id="LB"></button>
+<div class="dnav"><button onclick="pd()">◀</button><div class="dtxt"><b id="DT"></b><small id="DD"></small></div><button onclick="nd()">▶</button></div>
+<div class="sbar"><span id="SF">-</span><span id="SA">-</span><span id="SH">-</span><span id="SN">-</span></div>
 <div class="wlist" id="WL"></div>
-<div class="svbar"><button class="svbtn" id="SBB" onclick="sv()"></button></div>
+<div class="abtn"><button class="g" onclick="dlLocal()" id="BB1">📥 备份</button><button class="b" onclick="toggleAutoSync()" id="BB2">☁️ 自动同步</button><button class="o" onclick="showEmpModal()" id="BB3">👤 切换员工</button><button class="r" onclick="showBkList()" id="BB4">📋 历史备份</button><button class="d" onclick="window.location.href='v2admin.html'" id="BB5">⚙️ 管理</button></div>
 <div class="sts" id="ST"></div>
-<div class="alnk"><a href="admin-v2.html" id="ALNK"></a></div>
-<div class="stp">
-<label id="TLBL"></label>
-<input id="TI" type="password" placeholder="ghp_xxx...">
-<button id="TBTN" onclick="svt()"></button>
-<p class="inf" id="TINF"></p>
-<div class="bbtn">
-<button class="gb" id="BBKP" onclick="backupGitHub()"></button>
-<button class="pb" id="BLIST" onclick="listBackups()"></button>
-<button class="db" id="BLOCAL" onclick="dlLocal()"></button>
-</div>
-<div class="blist" id="BLISTBOX" style="display:none"></div>
-</div>
+<div class="modal" id="EM"><div class="box"><h3 id="EMT">👤 ເລືອກພະນັກງານ</h3><div id="EL"></div><button class="close" onclick="closeEmpModal()" id="EMC">ປິດ</button></div></div>
+<div class="modal" id="BK"><div class="box"><h3 id="BKT">📋 ປະຫັວດການສຳຮອງ</h3><div id="BL"></div><button class="close" onclick="closeBkList()" id="BKC">ປິດ</button></div></div>
 <script>
-var REPO='guocheng1378/attendance-tracker',API='https://api.github.com/repos/'+REPO,RAW='https://raw.githubusercontent.com/'+REPO+'/main/';
-var E=[{id:1,n:'ໂອນ',z:'盘'},{id:2,n:'ມູ',z:'姆'},{id:3,n:'ຣິມ',z:'松'},{id:4,n:'ບາວ',z:'巴'},{id:5,n:'ຊົງ',z:'恩'},{id:6,n:'ຈົງ',z:'乐昂'},{id:7,n:'ເບີນ',z:'文'},{id:8,n:'ຕົງ',z:'米'},{id:9,n:'ຈົງ',z:'拽'},{id:10,n:'ກິນ',z:'春'},{id:11,n:'ຄົງ',z:'研'},{id:12,n:'ມົວ',z:'罗'}];
-var D=new Date(),SS={},dk,lang='lo',ghToken='',allData=[];
-var TXT={
-lo:{title:'ຕາຕະລາງເຊັນເຂົ້າ',sub:'ບັນທຶກການເຂົ້າວຽກປະຈຳວັນ',full:'ທັງມື້',half:'ປາກສາ',abs:'ບໍ່ມາ',save:'ບັນທຶກ',saved:'✅ ຖືກບັນທຶກແລ້ວ!',empty:'ກະລຸນາເລືອກສະຖານະກ່ອນ',admin:'📊 ຫນ້າຈໍຄຸ້ມຄອງ',langBtn:'中文',
-tokLbl:'🔑 GitHub Token',tokBtn:'ບັນທຶກ',tokInf:'ຕື່ມ Token (repo) ເພື່ອສຳຮອງ',
-syncing:'<span class="spinner"></span>...',ok:'✅ ສຳເລັດ',err:'❌ ມີຂໍ້ຜິດພາດ',
-btnBkp:'☁️ ສຳຮອງ',btnList:'📥 ເບິ່ງສຳຮອງ',btnLocal:'📦 ດາວໂຫຼດ',
-restore:'ກູ້ຄືນ',noBk:'ບໍ່ມີສຳຮອງ',confirmR:'ກູ້ຄືນສຳຮອງນີ້?'},
-zh:{title:'考勤签到表',sub:'每日出勤记录',full:'全天',half:'半天',abs:'缺勤',save:'保存记录',saved:'✅ 已保存!',empty:'请先选择考勤状态',admin:'📊 管理后台',langBtn:'LOA',
-tokLbl:'🔑 GitHub Token',tokBtn:'保存',tokInf:'输入 Token (repo) 以备份',
-syncing:'<span class="spinner"></span>...',ok:'✅ 完成',err:'❌ 出错',
-btnBkp:'☁️ 备份到GitHub',btnList:'📥 查看备份',btnLocal:'📦 下载JSON',
-restore:'恢复',noBk:'暂无备份',confirmR:'恢复这个备份？'}
-};
-function toggleLang(){lang=(lang==='lo')?'zh':'lo';localStorage.setItem('att_lang',lang);ui();rl();ls();}
-function ui(){var t=TXT[lang];document.getElementById('LB').textContent=t.langBtn;
-var h1=document.getElementById('T');if(h1)h1.textContent=t.title;
-var ps=document.getElementById('S');if(ps)ps.textContent=t.sub;
-document.getElementById('sfl').textContent=t.full;document.getElementById('shl').textContent=t.half;document.getElementById('sal').textContent=t.abs;
-document.getElementById('SBB').textContent=t.save;document.getElementById('ALNK').textContent=t.admin;
-document.getElementById('TLBL').textContent=t.tokLbl;document.getElementById('TBTN').textContent=t.tokBtn;
-document.getElementById('TINF').textContent=t.tokInf;
-document.getElementById('BBKP').textContent=t.btnBkp;document.getElementById('BLIST').textContent=t.btnList;
-document.getElementById('BLOCAL').textContent=t.btnLocal;
-if(ghToken)document.getElementById('TI').value=ghToken;}
-function fd(){return D.getFullYear()+'-'+String(D.getMonth()+1).padStart(2,'0')+'-'+String(D.getDate()).padStart(2,'0');}
-function rd(){var wd=lang==='lo'?'lo-LA':'zh-CN';document.getElementById('DD').textContent=D.toLocaleDateString(wd,{month:'long',day:'numeric'});document.getElementById('DW').textContent=D.toLocaleDateString(wd,{weekday:'long'});}
-function cd(d){D.setDate(D.getDate()+d);rd();ls();us();}
-function rl(){var c=document.getElementById('WL');c.innerHTML='';var t=TXT[lang];E.forEach(function(e){var h='<div class="wcard"><div class="wname">'+e.n+'<small>'+e.z+'</small></div><div class="sbtns">';
-h+='<button class="sbtn" onclick="ss('+e.id+',\'f\',this,\'sel\')"><span class="si">✅</span><span>'+t.full+'</span></button>';
-h+='<button class="sbtn" onclick="ss('+e.id+',\'h\',this,\'hsel\')"><span class="si">⚠️</span><span>'+t.half+'</span></button>';
-h+='<button class="sbtn" onclick="ss('+e.id+',\'a\',this,\'asel\')"><span class="si">❌</span><span>'+t.abs+'</span></button>';
-h+='</div></div>';c.innerHTML+=h;});}
-function ss(id,st,b,cls){SS[id]=st;b.closest('.sbtns').querySelectorAll('.sbtn').forEach(function(x){x.className='sbtn';});b.className='sbtn '+cls;us();}
-function us(){var f=0,h=0,a=0;Object.values(SS).forEach(function(s){if(s==='f')f++;else if(s==='h')h++;else a++;});document.getElementById('sf').textContent=f;document.getElementById('sh').textContent=h;document.getElementById('sa').textContent=a;}
-function ls(){dk=fd();var src=allData.length>0?allData:[];
-if(src.length===0){try{src=JSON.parse(localStorage.getItem('att2'));}catch(e){}if(!src)src=[];}
-SS={};src.forEach(function(x){if(x.d===dk&&x.w&&x.s)SS[x.w]=x.s;});
-document.querySelectorAll('.wcard').forEach(function(c,i){var eid=E[i].id;var st=SS[eid];c.querySelectorAll('.sbtn').forEach(function(b){b.className='sbtn';});if(st){var map={f:0,h:1,a:2};var btn=c.querySelectorAll('.sbtn')[map[st]];if(btn){var cls={f:'sel',h:'hsel',a:'asel'};btn.className='sbtn '+cls[st];}}});us();}
-function getRec(){var r=[];try{r=JSON.parse(localStorage.getItem('att2'));}catch(e){}return r||[];}
-function sv(){dk=fd();var k=Object.keys(SS);var t=TXT[lang];if(k.length===0){alert(t.empty);return;}
-var lr=getRec().filter(function(x){return x.d!==dk;});
-E.forEach(function(e){lr.push({d:dk,w:e.id,n:e.n,z:e.z,s:SS[e.id]||'a',t:new Date().toISOString()});});
-localStorage.setItem('att2',JSON.stringify(lr));allData=lr;
-var b=document.getElementById('SBB');b.textContent=t.saved;b.className='svbtn done';
-setTimeout(function(){b.textContent=t.save;b.className='svbtn';},2000);}
-function svt(){ghToken=document.getElementById('TI').value.trim();if(ghToken){localStorage.setItem('att_gh_token',ghToken);}else{localStorage.removeItem('att_gh_token');ghToken='';}ui();}
-function backupGitHub(){if(!ghToken){alert('请先输入 Token');return;}
-var t=TXT[lang],st=document.getElementById('ST');st.innerHTML=t.syncing;
-var data=getRec();if(data.length===0){alert('No data');st.innerHTML='';return;}
-var now=new Date();var fn='backup/attendance-'+now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+'_'+String(now.getHours()).padStart(2,'0')+String(now.getMinutes()).padStart(2,'0')+'.json';
-var body=JSON.stringify(data,null,2);
-fetch(API+'/contents/'+fn,{method:'PUT',headers:{'Authorization':'token '+ghToken,'Content-Type':'application/json'},
-body:JSON.stringify({message:'backup '+fn.split('/')[1],content:btoa(unescape(encodeURIComponent(body))),branch:'main'})})
-.then(function(r){return r.json();}).then(function(d){if(d.content){st.innerHTML='✅ '+fn.split('/')[1];}else{st.innerHTML=t.err;}})
-.catch(function(){st.innerHTML=t.err;});}
-function listBackups(){if(!ghToken){alert('请先输入 Token');return;}
-var t=TXT[lang],st=document.getElementById('ST'),box=document.getElementById('BLISTBOX');
-st.innerHTML=t.syncing;
-fetch(API+'/contents/backup',{headers:{'Authorization':'token '+ghToken}})
-.then(function(r){return r.json();}).then(function(files){
-var jsons=files.filter(function(f){return f.name.endsWith('.json');}).sort().reverse();
-if(jsons.length===0){box.innerHTML='<div style="padding:8px;text-align:center;color:#888;font-size:12px">'+t.noBk+'</div>';box.style.display='block';st.innerHTML='';return;}
+var ghToken=localStorage.getItem('att_gh_token')||'';
+var REPO='guocheng1378/attendance-tracker';
+var API='https://api.github.com';
+var RAW='https://raw.githubusercontent.com/'+REPO+'/main/';
+var lang=localStorage.getItem('att_lang')||'lo';
+var TXT={lo:{t1:'📋 ຕາຕະລາງເຊັນເຂົ້າ',t2:'ເລືອກວັນ ແລະ ກົດເຊັນ',tt:['✅ ສະເຊັນແລ້ວ','⏳ ກຳລັງດຳເນີນງານ...','❌ ບໍ່ມີຂໍ້ມູນ'],w:['ດີນ້ຳ','ງົວ','ງົວ2','ນ້ຳ'],ac:['✅ ເຊັນເຂົ້າ','🔄 ເປີດໂປດ','⏭️ ຂ້າມມື້ນີ້','↩️ ເປີດເຊັນຄືນ'],af:'⏳ ກຳລັງໂຫຼດ...',rl:'🔄 ກຳລັງໂຫຼດລາຍຊື່...',bk:'📋 ບ່ອນສຳຮອງ:',nb:'⚠️ ບໍ່ມີບ່ອນສຳຮອງ',rs:'🔄 ກຳລັງຟື້ນຟູ...',cn:'✅ ຟື້ນຟູສຳເລັດ',er:'❌ ມີຄວາມຜິດພາດ',syn:'☁️ ກຳລັງຊົງ...',sb:'✅ ຊົງສຳເລັດ',cf:'⚠️ ຍັງບໍ່ໄດ້ຕັ້ງ Token GitHub',tb:'🔄 ຕິດຕາມອັດຕໂມແຕ່ລະ',as:['⏸️ ຢຸດຕິດຕາມ','▶️ ເລີ່ມຕິດຕາມອັດຕໂມ'],nwd:'⚠️ ບໍ່ມີວັນໃດເລີຍ',nwe:'⚠️ ຍັງບໍ່ໄດ້ເລືອກພະນັກງານ',cnf:'✅ ເຊັນສຳເລັດ!',alr:'⚠️ ເຊັນແລ້ວມື້ນີ້'},en:{t1:'📋 Attendance Sheet',t2:'Select a day and sign in',tt:['✅ Signed in','⏳ Processing...','❌ No data'],w:['Noy','Cow','Cow2','Noy'],ac:['✅ Sign in','🔄 Open menu','⏭️ Skip today','↩️ Reopen sign-in'],af:'⏳ Loading...',rl:'🔄 Loading list...',bk:'📋 Backup slots:',nb:'⚠️ No backups yet',rs:'🔄 Restoring...',cn:'✅ Restored!',er:'❌ Error',syn:'☁️ Syncing...',sb:'✅ Synced!',cf:'⚠️ GitHub token not set',tb:'🔄 Auto sync every 30s',as:['⏸️ Stop auto sync','▶️ Start auto sync'],nwd:'⚠️ No dates available',nwe:'⚠️ No employee selected',cnf:'✅ Signed in!',alr:'⚠️ Already signed in today'}};
+var EMP=JSON.parse(localStorage.getItem('emp')||'[]');
+var allData=[];var ce=null;var fd=function(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+function tgLang(){lang=lang==='lo'?'en':'lo';localStorage.setItem('att_lang',lang);ui();ls();}
+function ui(){var t=TXT[lang];document.getElementById('LB').textContent=lang==='lo'?'EN':'LO';document.getElementById('T1').textContent=t.t1;document.getElementById('T2').textContent=t.t2;document.getElementById('BB1').textContent='📥 '+t.bk;document.getElementById('BB3').textContent='👤 '+t.ac[2];document.getElementById('BB5').textContent='⚙️ '+t.ac[1];}
+function getDates(){var ds={};allData.forEach(function(r){ds[r.d]=1;});return Object.keys(ds).sort().reverse();}
+var cdi=0;
+function pd(){var ds=getDates();if(ds.length===0)return;cdi=Math.min(cdi+1,ds.length-1);rd();}
+function nd(){var ds=getDates();if(ds.length===0)return;cdi=Math.max(cdi-1,0);rd();}
+function rd(){var ds=getDates();if(ds.length===0){document.getElementById('DT').textContent='--';document.getElementById('DD').textContent='--';document.getElementById('WL').innerHTML='';return;}var d=ds[cdi];var dp=d.split('-');var mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];document.getElementById('DT').textContent=d;document.getElementById('DD').textContent=mn[parseInt(dp[1])-1]+' '+parseInt(dp[2]);var recs=allData.filter(function(r){return r.d===d;});var f=0,h=0,a=0;recs.forEach(function(r){if(r.s==='f')f++;else if(r.s==='h')h++;else if(r.s==='a')a++;});document.getElementById('SF').textContent='✅ '+f;document.getElementById('SA').textContent='❌ '+a;document.getElementById('SH').textContent='⚠️ '+h;document.getElementById('SN').textContent='📊 '+(f+h+a);var html='';EMP.forEach(function(e){var rec=recs.find(function(r){return r.w===e.id;});var cls=rec?(rec.s==='f'?'sn':rec.s==='h'?'sh':'sa'):'st';var sm=rec?(rec.s==='f'?'✅':rec.s==='h'?'⚠️':'❌'):'-';html+='<div class="witem '+cls+'" onclick="cs('+e.id+')"><div class="wi" style="background:'+(e.c||'#e0e0e0')+'">'+e.n.charAt(0)+'</div><div class="wn"><b>'+e.n+'</b><small>'+(e.z||'')+'</small></div><div class="ws"><b>'+sm+'</b></div></div>';});document.getElementById('WL').innerHTML=html;}
+function ls(){var st=document.getElementById('ST');var t=TXT[lang];st.innerHTML=t.rl;fetch(RAW+'backup/attendance-'+fd()+'.json?='+Date.now())
+.then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(d){allData=d;st.innerHTML='';rd();})
+.catch(function(){st.innerHTML=t.er;});}
+function cs(id){var t=TXT[lang];if(!id)return;var ds=getDates();if(ds.length===0){alert(t.nwd);return;}var d=ds[cdi];var ex=allData.find(function(r){return r.d===d&&r.w===id;});if(ex&&ex.s==='f'){alert(t.alr);return;}var nm=EMP.find(function(e){return e.id===id;});var n=nm?nm.n:'?',z=nm?nm.z:'';var idx=allData.findIndex(function(r){return r.d===d&&r.w===id;});if(idx>=0){allData[idx].s='f';allData[idx].t=new Date().toISOString();}else{allData.push({d:d,w:id,n:n,z:z,s:'f',t:new Date().toISOString()});}st.innerHTML=t.tt[0]+' '+n;setTimeout(function(){st.innerHTML='';},1500);rd();syncData();}
+function syncData(){if(!ghToken)return;var st=document.getElementById('ST');st.innerHTML='☁️';var emp=JSON.parse(localStorage.getItem('emp')||'[]');var nmap={};emp.forEach(function(e){nmap[e.id]=e;});allData.forEach(function(r){if(r.w&&nmap[r.w]){r.n=nmap[r.w].n;r.z=nmap[r.w].z;}});var sha='';fetch(API+'/repos/'+REPO+'/contents/backup/attendance-'+fd()+'.json',{headers:{'Authorization':'token '+ghToken,'Accept':'application/vnd.github.v3+json'}})
+.then(function(r){if(r.status===200)return r.json().then(function(d){sha=d.sha;return d;});return null;}).then(function(){return fetch(API+'/repos/'+REPO+'/contents/backup/attendance-'+fd()+'.json',{method:'PUT',headers:{'Authorization':'token '+ghToken,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},body:JSON.stringify({message:'auto: '+fd(),content:btoa(unescape(encodeURIComponent(JSON.stringify(allData,null,2)))),sha:sha,branch:'main'})});}).then(function(r){return r.json();}).then(function(d){st.innerHTML='☁️';setTimeout(function(){st.innerHTML='';},1000);}).catch(function(){st.innerHTML='';});}
+function dlLocal(){var r=getRec();if(r.length===0){alert('No data');return;}
+var b=new Blob([JSON.stringify(r,null,2)],{type:'application/json'});
+var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='attendance_'+fd()+'.json';a.click();
+var ws={};EMP.forEach(function(e){ws[e.id]={id:e.id,n:e.n,z:e.z,f:0,h:0,a:0};});
+r.forEach(function(rec){if(rec.w&&ws[rec.w])ws[rec.w][rec.s]++;});
+var summary={month:fd().substring(0,7),generated:new Date().toISOString(),employees:Object.values(ws).map(function(w){return{id:w.id,n:w.n,z:w.z,f:w.f,a:w.a,h:w.h,days:w.f+w.h*0.5};})};
+var sb=new Blob([JSON.stringify(summary,null,2)],{type:'application/json'});
+var sa=document.createElement('a');sa.href=URL.createObjectURL(sb);sa.download='wage_'+fd().substring(0,7).replace('-','_')+'.json';sa.click();}
+function toggleAutoSync(){var t=TXT[lang];if(window._asi){clearInterval(window._asi);window._asi=null;alert(t.as[0]);}else{window._asi=setInterval(syncData,30000);alert(t.as[1]);}}
+function showBkList(){var t=TXT[lang],st=document.getElementById('ST');st.innerHTML=t.bk;
+fetch(API+'/repos/'+REPO+'/contents/backup',{headers:{'Authorization':'token '+ghToken,'Accept':'application/vnd.github.v3+json'}})
+.then(function(r){return r.json();}).then(function(items){var box=document.getElementById('BL');var jsons=items.filter(function(f){return f.name.endsWith('.json');}).sort().reverse();
+if(jsons.length===0){box.innerHTML='<div style="padding:8px;text-align:center;color:#888;font-size:12px">'+t.nb+'</div>';box.style.display='block';st.innerHTML='';return;}
 var html='';jsons.forEach(function(f){var d=f.name.replace('attendance-','').replace('.json','');
-html+='<div class="bitem"><span>📅 '+d+'</span><button class="rb" onclick="restoreBackup(\''+f.name+'\',\''+f.sha+'\')">'+t.restore+'</button></div>';});
-box.innerHTML=html;box.style.display='block';st.innerHTML='';})
-.catch(function(){st.innerHTML=t.err;});}
-function restoreBackup(name,sha){if(!confirm(TXT[lang].confirmR))return;
-var t=TXT[lang],st=document.getElementById('ST');st.innerHTML=t.syncing;
+html+='<div class="fitem"><div class="fi" style="background:#e3f2fd">📅</div><div class="fn">'+d+'</div><button class="rb" onclick="restoreBackup(\''+f.name+'\',\''+f.sha+'\')">'+t.rs+'</button></div>';});box.innerHTML=html;box.style.display='block';st.innerHTML='';})
+.catch(function(){st.innerHTML=t.er;});}
+function restoreBackup(name,sha){if(!confirm(TXT[lang].cnf))return;
+var t=TXT[lang],st=document.getElementById('ST');st.innerHTML=t.rs;
 fetch(RAW+'backup/'+name+'?t='+Date.now())
 .then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(data){
 localStorage.setItem('att2',JSON.stringify(data));allData=data;ls();
-st.innerHTML='✅ '+data.length+' '+t.ok;
+st.innerHTML='✅ '+data.length+' '+t.cn;
 setTimeout(function(){st.innerHTML='';},3000);})
-.catch(function(){st.innerHTML=t.err;});}
-function dlLocal(){var r=getRec();if(r.length===0){alert('No data');return;}
-var b=new Blob([JSON.stringify(r,null,2)],{type:'application/json'});
-var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='attendance_'+fd()+'.json';a.click();}
+.catch(function(){st.innerHTML=t.er;});}
+function showEmpModal(){var html='';EMP.forEach(function(e){html+='<div class="fitem" onclick="selectEmp('+e.id+')"><div class="fi" style="background:'+(e.c||'#e0e0e0')+'">'+e.n.charAt(0)+'</div><div class="fn">'+e.n+' ('+(e.z||'')+')</div></div>';});document.getElementById('EL').innerHTML=html;document.getElementById('EM').classList.add('show');}
+function closeEmpModal(){document.getElementById('EM').classList.remove('show');}
+function selectEmp(id){var nm=EMP.find(function(e){return e.id===id;});if(nm){localStorage.setItem('att_emp',nm.id);ce=nm;}closeEmpModal();ls();}
+function closeBkList(){document.getElementById('BK').classList.remove('show');}
 lang=localStorage.getItem('att_lang')||'lo';
 ghToken=localStorage.getItem('att_gh_token')||'';
 rd();ui();rl();ls();
