@@ -21,35 +21,46 @@ body{font-family:sans-serif;background:#f5f7fa;color:#333;max-width:480px;margin
 .ms.h b{color:#f59e0b}
 .ms.a b{color:#ef4444}
 table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-th,td{padding:10px 8px;text-align:center;font-size:13px;border-bottom:1px solid #f0f0f0}
-th{background:#f9fafb;font-weight:600;color:#555}
+th,td{padding:10px 8px;text-align:center;font-size:13px}
+th{background:#f0f2f5;font-weight:600}
 .nm{text-align:left;font-weight:600}
-.nm small{font-weight:400;color:#999}
-.ebtn{width:100%;padding:12px;background:#2563eb;color:white;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;margin:16px 0;font-family:sans-serif}
-.blk{text-align:center;padding:8px 0}
-.blk a{color:#2563eb;text-decoration:none;font-size:14px}
+.nm small{color:#888;font-weight:400}
+tr:not(:last-child) td{border-bottom:1px solid #f0f2f5}
+.abtn{display:flex;gap:8px;margin:16px 0;flex-wrap:wrap;justify-content:center}
+.abtn button{flex:1;min-width:120px;padding:12px;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer}
+.abtn .g{background:#22c55e;color:white}
+.abtn .b{background:#3b82f6;color:white}
+.abtn .o{background:#f59e0b;color:white}
+.abtn .r{background:#ef4444;color:white}
+.abtn .p{background:#8b5cf6;color:white}
 </style>
 </head>
 <body>
-<div class="hdr"><h1>📊 管理后台</h1><p>月度考勤汇总</p></div>
-<div class="mnav"><button onclick="cm(-1)">◀</button><b id="ML"></b><button onclick="cm(1)">▶</button></div>
-<div class="mstats" id="MS"></div>
+<div class="hdr"><h1>📋 考勤管理后台</h1><p id="MT"></p></div>
+<div class="mnav"><button onclick="pm()">◀</button><b id="YM"></b><button onclick="nm()">▶</button></div>
+<div class="mstats" id="ST"></div>
+<div class="abtn">
+<button class="b" onclick="ec()">📤 备份数据</button>
+<button class="o" onclick="im()">📥 导入JSON</button>
+<button class="g" onclick="ew()">💰 导出工资统计</button>
+<button class="p" onclick="window.location.href='v2.html'">📅 打卡页面</button>
+</div>
 <table><thead><tr id="TH"></tr></thead><tbody id="TB"></tbody></table>
-<button class="ebtn" onclick="ec()">📥 导出 CSV</button>
-<button class="ebtn" onclick="ew()" style="background:#16a34a">💰 导出工资统计</button>
-<div class="blk"><a href="v2.html">📋 返回签到</a></div>
 <script>
-var E=[{id:1,n:'ໂອນ',z:'盘'},{id:2,n:'ມູ',z:'姆'},{id:3,n:'ຣິມ',z:'松'},{id:4,n:'ບາວ',z:'巴'},{id:5,n:'ຊົງ',z:'恩'},{id:6,n:'ຈົງ',z:'乐昂'},{id:7,n:'ເບີນ',z:'文'},{id:8,n:'ຕົງ',z:'米'},{id:9,n:'ຈົງ',z:'拽'},{id:10,n:'ກິນ',z:'春'},{id:11,n:'ຄົງ',z:'研'},{id:12,n:'ມົວ',z:'罗'}];
-var y,m,AR=[];
-function init(){var d=new Date();y=d.getFullYear();m=d.getMonth();la();}
-function cm(d){m+=d;if(m>11){m=0;y++;}if(m<0){m=11;y--;}la();}
-function la(){var ym=y+'-'+String(m+1).padStart(2,'0');var r=[];try{r=JSON.parse(localStorage.getItem('att2'));}catch(e){}if(!r)r=[];AR=r.filter(function(x){return x.d>=ym+'-01'&&x.d<=ym+'-31';});render();}
-function render(){var mn=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];document.getElementById('ML').textContent=mn[m]+' '+y;var ws={};E.forEach(function(e){ws[e.id]={n:e.n,z:e.z,f:0,h:0,a:0};});AR.forEach(function(r){if(r.w&&ws[r.w])ws[r.w][r.s]++;});var tf=0,th=0,ta=0;Object.values(ws).forEach(function(w){tf+=w.f;th+=w.h;ta+=w.a;});document.getElementById('MS').innerHTML='<div class="ms"><b>'+AR.length+'</b><small>记录</small></div><div class="ms f"><b>'+tf+'</b><small>全天</small></div><div class="ms h"><b>'+th+'</b><small>半天</small></div><div class="ms a"><b>'+ta+'</b><small>缺勤</small></div>';
+var AR=JSON.parse(localStorage.getItem('att2')||'[]');var y,m;function now(){var d=new Date();y=d.getFullYear();m=d.getMonth();}
+function E(){return JSON.parse(localStorage.getItem('emp')||'[]');}
+now();
+function rg(d){var p=d.split('-');return+p[0]===y&&+p[1]-1===m;}
+function pm(){m--;if(m<0){m=11;y--;}ri();}
+function nm(){m++;if(m>11){m=0;y++;}ri();}
+function ri(){var MR=['1','2','3','4','5','6','7','8','9','10','11','12'];document.getElementById('YM').textContent=y+' - '+MR[m];document.getElementById('MT').textContent=y+' 年 '+MR[m] + ' 月';var D=AR.filter(function(r){return rg(r.d);});var ws={};E().forEach(function(e){ws[e.id]={id:e.id,n:e.n,z:e.z,f:0,h:0,a:0};});var tf=0,th=0,ta=0;D.forEach(function(r){if(r.w&&ws[r.w]){ws[r.w][r.s]++;if(r.s==='f')tf++;if(r.s==='h')th++;if(r.s==='a')ta++;}});
+document.getElementById('ST').innerHTML='<div class="ms"><b>'+D.length+'</b><small>总记录</small></div><div class="ms f"><b>'+tf+'</b><small>全天</small></div><div class="ms h"><b>'+th+'</b><small>半天</small></div><div class="ms a"><b>'+ta+'</b><small>缺勤</small></div>';
 document.getElementById('TH').innerHTML='<th>姓名</th><th>✅ 全天</th><th>⚠️ 半天</th><th>❌ 缺勤</th><th>共</th>';
 var tb='';Object.values(ws).forEach(function(w){var t=w.f*1+w.h*0.5;tb+='<tr><td class="nm">'+w.n+'<br><small>'+w.z+'</small></td><td>'+w.f+'</td><td>'+w.h+'</td><td>'+w.a+'</td><td>'+t+'</td></tr>';});document.getElementById('TB').innerHTML=tb;}
 function ec(){var csv='\uFEFF日期,姓名,中文名,状态\n';var sm={f:'全天',h:'半天',a:'缺勤'};AR.forEach(function(r){csv+=r.d+','+r.n+','+r.z+','+sm[r.s]+'\n';});var b=new Blob([csv],{type:'text/csv;charset=utf-8'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='attendance_'+y+'_'+String(m+1).padStart(2,'0')+'.csv';a.click();}
-function ew(){var ws={};E.forEach(function(e){ws[e.id]={id:e.id,n:e.n,z:e.z,f:0,h:0,a:0};});AR.forEach(function(r){if(r.w&&ws[r.w])ws[r.w][r.s]++;});var summary={month:y+'-'+String(m+1).padStart(2,'0'),generated:new Date().toISOString(),employees:Object.values(ws).map(function(w){return{id:w.id,n:w.n,z:w.z,f:w.f,a:w.a,h:w.h,days:w.f+w.h*0.5};})};var json=JSON.stringify(summary,null,2);var blob=new Blob([json],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='wage_'+y+'_'+String(m+1).padStart(2,'0')+'.json';a.click();}
-init();
+function ew(){var ws={};E().forEach(function(e){ws[e.id]={id:e.id,n:e.n,z:e.z,f:0,h:0,a:0};});AR.forEach(function(r){if(r.w&&ws[r.w])ws[r.w][r.s]++;});var summary={month:y+'-'+String(m+1).padStart(2,'0'),generated:new Date().toISOString(),employees:Object.values(ws).map(function(w){return{id:w.id,n:w.n,z:w.z,f:w.f,a:w.a,h:w.h,days:w.f+w.h*0.5};})};var json=JSON.stringify(summary,null,2);var blob=new Blob([json],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='wage_'+y+'_'+String(m+1).padStart(2,'0')+'.json';a.click();}
+function im(){var i=document.createElement('input');i.type='file';i.accept='.json';i.onchange=function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){try{var d=JSON.parse(ev.target.result);if(Array.isArray(d)){AR=AR.concat(d);localStorage.setItem('att2',JSON.stringify(AR));alert('✅ 已导入 '+d.length+' 条记录');ri();}else{alert('❌ JSON格式错误');}}catch(ex){alert('❌ 解析失败');}};r.readAsText(f);};i.click();}
+ri();
 </script>
 </body>
 </html>
