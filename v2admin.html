@@ -36,6 +36,7 @@ th{background:#f9fafb;font-weight:600;color:#555}
 <div class="mstats" id="MS"></div>
 <table><thead><tr id="TH"></tr></thead><tbody id="TB"></tbody></table>
 <button class="ebtn" onclick="ec()">📥 导出 CSV</button>
+<button class="ebtn" onclick="ew()" style="background:#16a34a">💰 导出工资统计</button>
 <div class="blk"><a href="v2.html">📋 返回签到</a></div>
 <script>
 var E=[{id:1,n:'ໂອນ',z:'盘'},{id:2,n:'ມູ',z:'姆'},{id:3,n:'ຣິມ',z:'松'},{id:4,n:'ບາວ',z:'巴'},{id:5,n:'ຊົງ',z:'恩'},{id:6,n:'ຈົງ',z:'乐昂'},{id:7,n:'ເບີນ',z:'文'},{id:8,n:'ຕົງ',z:'米'},{id:9,n:'ຈົງ',z:'拽'},{id:10,n:'ກິນ',z:'春'},{id:11,n:'ຄົງ',z:'研'},{id:12,n:'ມົວ',z:'罗'}];
@@ -47,6 +48,7 @@ function render(){var mn=['1月','2月','3月','4月','5月','6月','7月','8月
 document.getElementById('TH').innerHTML='<th>姓名</th><th>✅ 全天</th><th>⚠️ 半天</th><th>❌ 缺勤</th><th>共</th>';
 var tb='';Object.values(ws).forEach(function(w){var t=w.f*1+w.h*0.5;tb+='<tr><td class="nm">'+w.n+'<br><small>'+w.z+'</small></td><td>'+w.f+'</td><td>'+w.h+'</td><td>'+w.a+'</td><td>'+t+'</td></tr>';});document.getElementById('TB').innerHTML=tb;}
 function ec(){var csv='\uFEFF日期,姓名,中文名,状态\n';var sm={f:'全天',h:'半天',a:'缺勤'};AR.forEach(function(r){csv+=r.d+','+r.n+','+r.z+','+sm[r.s]+'\n';});var b=new Blob([csv],{type:'text/csv;charset=utf-8'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='attendance_'+y+'_'+String(m+1).padStart(2,'0')+'.csv';a.click();}
+function ew(){var ws={};E.forEach(function(e){ws[e.id]={id:e.id,n:e.n,z:e.z,f:0,h:0,a:0};});AR.forEach(function(r){if(r.w&&ws[r.w])ws[r.w][r.s]++;});var summary={month:y+'-'+String(m+1).padStart(2,'0'),generated:new Date().toISOString(),employees:Object.values(ws).map(function(w){return{id:w.id,n:w.n,z:w.z,f:w.f,a:w.a,h:w.h,days:w.f+w.h*0.5};})};var json=JSON.stringify(summary,null,2);var blob=new Blob([json],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='wage_'+y+'_'+String(m+1).padStart(2,'0')+'.json';a.click();}
 init();
 </script>
 </body>
