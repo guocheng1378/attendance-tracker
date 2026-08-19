@@ -75,16 +75,18 @@ function rl(){var st=document.getElementById('ST');var t=TXT[lang];st.innerHTML=
 .then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(txt){var m=txt.match(/EMPLOYEES:\s*\[([\s\S]*?)\]/);if(m){var arr=eval('['+m[1]+']');var emp=arr.map(function(e){return{id:e.id,n:e.name,z:e.nameZh,c:['#22c55e','#2563eb','#f59e0b','#ef4444','#8b5cf6','#ec4899','#14b8a6','#f97316','#6366f1','#84cc16','#06b6d4','#a855f7'][e.id-1]||'#e0e0e0'};});localStorage.setItem('emp',JSON.stringify(emp));EMP=emp;}})
 .catch(function(){});}
 function cs(id){var t=TXT[lang];if(!id)return;var ds=getDates();if(ds.length===0){alert(t.nwd);return;}var d=ds[cdi];var ex=allData.find(function(r){return r.d===d&&r.w===id;});if(ex&&ex.s==='f'){alert(t.alr);return;}var nm=EMP.find(function(e){return e.id===id;});var n=nm?nm.n:'?',z=nm?nm.z:'';var idx=allData.findIndex(function(r){return r.d===d&&r.w===id;});if(idx>=0){allData[idx].s='f';allData[idx].t=new Date().toISOString();}else{allData.push({d:d,w:id,n:n,z:z,s:'f',t:new Date().toISOString()});}st.innerHTML=t.tt[0]+' '+n;setTimeout(function(){st.innerHTML='';},1500);rd();syncData();}
-function syncData(){if(!ghToken)return;var st=document.getElementById('ST');st.innerHTML='☁️';var emp=JSON.parse(localStorage.getItem('emp')||'[]');var nmap={};emp.forEach(function(e){nmap[e.id]=e;});allData.forEach(function(r){if(r.w&&nmap[r.w]){r.n=nmap[r.w].n;r.z=nmap[r.w].z;}});var sha='';fetch(API+'/repos/'+REPO+'/contents/backup/attendance-'+fd()+'.json',{headers:{'Authorization':'token '+ghToken,'Accept':'application/vnd.github.v3+json'}})
-.then(function(r){if(r.status===200)return r.json().then(function(d){sha=d.sha;return d;});return null;}).then(function(){return fetch(API+'/repos/'+REPO+'/contents/backup/attendance-'+fd()+'.json',{method:'PUT',headers:{'Authorization':'token '+ghToken,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},body:JSON.stringify({message:'auto: '+fd(),content:btoa(unescape(encodeURIComponent(JSON.stringify(allData,null,2)))),sha:sha,branch:'main'})});}).then(function(r){return r.json();}).then(function(d){st.innerHTML='☁️';setTimeout(function(){st.innerHTML='';},1000);}).catch(function(){st.innerHTML='';});}
-function dlLocal(){var r=allData;if(r.length===0){alert('No data');return;}
-var b=new Blob([JSON.stringify(r,null,2)],{type:'application/json'});
-var da=document.createElement('a');da.href=URL.createObjectURL(b);da.download='attendance_'+fd()+'.json';da.click();
+function syncData(){if(!ghToken)return;var st=document.getElementById('ST');st.innerHTML='☁️';var emp=JSON.parse(localStorage.getItem('emp')||'[]');var nmap={};emp.forEach(function(e){nmap[e.id]=e;});allData.forEach(function(r){if(r.w&&nmap[r.w]){r.n=nmap[r.w].n;r.z=nmap[r.w].z;}});
+function uploadFile(path,content,message){var sha='';return fetch(API+'/repos/'+REPO+'/contents/'+path,{headers:{'Authorization':'token '+ghToken,'Accept':'application/vnd.github.v3+json'}})
+.then(function(r){if(r.status===200)return r.json().then(function(d){sha=d.sha;});return null;}).then(function(){return fetch(API+'/repos/'+REPO+'/contents/'+path,{method:'PUT',headers:{'Authorization':'token '+ghToken,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},body:JSON.stringify({message:message,content:btoa(unescape(encodeURIComponent(content))),sha:sha,branch:'main'})});});}
+var attJson=JSON.stringify(allData,null,2);
 var ws={};EMP.forEach(function(e){ws[e.id]={id:e.id,n:e.n,z:e.z,f:0,h:0,ab:0};});
-r.forEach(function(rec){if(rec.w&&ws[rec.w])ws[rec.w][rec.s==='a'?'ab':rec.s]++;});
+allData.forEach(function(rec){if(rec.w&&ws[rec.w])ws[rec.w][rec.s==='a'?'ab':rec.s]++;});
 var summary={month:fd().substring(0,7),generated:new Date().toISOString(),employees:Object.values(ws).map(function(w){return{id:w.id,n:w.n,z:w.z,f:w.f,a:w.ab,h:w.h,days:w.f+w.h*0.5};})};
-var sb=new Blob([JSON.stringify(summary,null,2)],{type:'application/json'});
-var sa=document.createElement('a');sa.href=URL.createObjectURL(sb);sa.download='wage_'+fd().substring(0,7).replace('-','_')+'.json';sa.click();}
+var wageJson=JSON.stringify(summary,null,2);
+Promise.all([
+uploadFile('backup/attendance-'+fd()+'.json',attJson,'auto: '+fd()),
+uploadFile('backup/wage_'+fd().substring(0,7).replace('-','_')+'.json',wageJson,'auto wage: '+fd().substring(0,7))
+]).then(function(){st.innerHTML='☁️';setTimeout(function(){st.innerHTML='';},1000);}).catch(function(){st.innerHTML='';});}
 function toggleAutoSync(){var t=TXT[lang];if(window._asi){clearInterval(window._asi);window._asi=null;alert(t.as[0]);}else{window._asi=setInterval(syncData,30000);alert(t.as[1]);}}
 function showBkList(){var t=TXT[lang],st=document.getElementById('ST');st.innerHTML=t.bk;
 fetch(API+'/repos/'+REPO+'/contents/backup',{headers:{'Authorization':'token '+ghToken,'Accept':'application/vnd.github.v3+json'}})
