@@ -17,6 +17,7 @@ body{font-family:sans-serif;background:#f5f7fa;color:#333;max-width:480px;margin
 .mnav b{font-size:16px;min-width:110px;text-align:center;color:#2563eb}
 .today{background:#eff6ff;border:1px solid #dbeafe;border-radius:12px;padding:12px 14px;margin:10px 0;font-size:13px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
 .today b{font-size:18px;color:#2563eb}
+.xbtn{display:block;width:100%;padding:10px;margin:6px 0 10px;background:#2563eb;color:white;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:sans-serif}
 .panel{background:white;border-radius:12px;padding:14px;margin:10px 0;box-shadow:0 1px 4px rgba(0,0,0,.06)}
 .panel h3{font-size:14px;margin-bottom:10px}
 .adv-form{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
@@ -72,6 +73,7 @@ th{background:#f9fafb;font-weight:600;color:#555}
 <div class="sts" id="ST"></div>
 </div>
 
+<button class="xbtn" onclick="exportCSV()">📥 导出本月工资 CSV</button>
 <table><thead><tr id="TH"></tr></thead><tbody id="TB"></tbody></table>
 <div class="rule" id="RULE"></div>
 <div class="ref"><a href="v2.html">去签到</a> · <a href="admin-v2.html">管理后台</a></div>
@@ -153,6 +155,22 @@ function build(){
   document.getElementById('TB').innerHTML=tb;
   document.getElementById('RULE').textContent='规则：应出勤天数=当月天数；出勤折算=全天×1+半天×0.5；应发工资=总工资÷当月天数×出勤折算；应发奖金=奖金÷当月天数×出勤折算；实发=应发工资+应发奖金−'+viewYM.slice(5,7)+'月预支。';
   renderAdvList();
+}
+function exportCSV(){
+  var dates=[...new Set(data.map(function(r){return r.d;}))].sort();var last=dates[dates.length-1];
+  var py=+viewYM.slice(0,4),pm=+viewYM.slice(5,7);var denom=daysInMonth(py,pm);
+  var ws={};E.forEach(function(e){ws[e.w]={f:0,h:0,a:0};});
+  data.forEach(function(r){if(r.d.indexOf(viewYM)===0&&ws[r.w]){if(r.s==='f')ws[r.w].f++;else if(r.s==='h')ws[r.w].h++;else if(r.s==='a')ws[r.w].a++;}});
+  var adv=advFor(viewYM);
+  var q=function(v){v=String(v==null?'':v);return '"'+v.replace(/"/g,'""')+'"';};
+  var rows=[['姓名','全天','半天','缺勤','出勤折算','应发工资','应发奖金','预支','实发']];
+  var sumS=0,sumB=0,sumA=0,sumN=0;
+  E.forEach(function(e){var w=ws[e.w],p=PAY[e.w];var d=w.f+w.h*0.5;var sal=Math.round((p[0]/denom)*d),bon=Math.round((p[1]/denom)*d),ad=adv[e.w]||0,net=sal+bon-ad;
+    sumS+=sal;sumB+=bon;sumA+=ad;sumN+=net;
+    rows.push([e.z+' '+e.n,w.f,w.h,w.a,(d%1===0?d:d.toFixed(1)),sal,bon,ad,net]);});
+  rows.push(['合计','','','','',sumS,sumB,sumA,sumN]);
+  var csv='\uFEFF'+rows.map(function(r){return r.map(q).join(',');}).join('\n');
+  var b=new Blob([csv],{type:'text/csv;charset=utf-8'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='工资_'+viewYM+'.csv';a.click();
 }
 function main(){
   ghToken=localStorage.getItem('att_gh_token')||'';if(ghToken)document.getElementById('TI').value=ghToken;
