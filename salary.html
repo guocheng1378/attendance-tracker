@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>考勤工资核算</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:sans-serif;background:#f5f7fa;color:#333;max-width:480px;margin:0 auto;padding:16px}
+.hdr{text-align:center;padding:16px 0}
+.hdr h1{font-size:20px}
+.hdr p{font-size:13px;color:#888}
+.hint{display:flex;justify-content:space-between;align-items:center;background:white;border-radius:12px;padding:10px 12px;margin:10px 0;box-shadow:0 1px 4px rgba(0,0,0,.06);font-size:12px}
+.hint b{color:#2563eb}
+.today{background:#eff6ff;border:1px solid #dbeafe;border-radius:12px;padding:12px 14px;margin:10px 0;font-size:13px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.today b{font-size:18px;color:#2563eb}
+table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+th,td{padding:9px 6px;text-align:center;font-size:12px;border-bottom:1px solid #f0f0f0}
+th{background:#f9fafb;font-weight:600;color:#555}
+.nm{text-align:left;font-weight:600}
+.nm small{font-weight:400;color:#999}
+.tot{font-weight:700;background:#f8fafc}
+.rule{margin-top:10px;font-size:11px;color:#888;background:white;border-radius:10px;padding:10px 12px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.ref{margin-top:10px;font-size:11px;color:#888;text-align:center}
+.ref a{color:#2563eb;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="hdr"><h1>💵 考勤工资核算</h1><p id="SUB"></p></div>
+<div class="hint"><span>统计月份</span><b id="YM"></b><span>应出勤天数</span><b id="DEN"></b><span>记录天数</span><b id="REC"></b></div>
+<div class="today" id="TODAY"></div>
+<table><thead><tr id="TH"></tr></thead><tbody id="TB"></tbody></table>
+<div class="rule" id="RULE"></div>
+<div class="ref"><a href="v2.html">去签到</a> · <a href="admin-v2.html">管理后台</a></div>
+<script>
+var REPO='guocheng1378/attendance-tracker',API='https://api.github.com/repos/'+REPO+'/contents/backup',RAW='https://raw.githubusercontent.com/'+REPO+'/main/backup/';
+var E=[{w:1,z:'盘',n:'ໂອນ'},{w:2,z:'姆',n:'ມູ'},{w:3,z:'松',n:'ຣິມ'},{w:4,z:'巴',n:'ບາວ'},{w:5,z:'恩',n:'ຊົງ'},{w:6,z:'乐昂',n:'ຈົງ'},{w:7,z:'文',n:'ເບີນ'},{w:8,z:'米',n:'ຕົງ'},{w:9,z:'拽',n:'ຈົງ'},{w:10,z:'春',n:'ກິນ'},{w:11,z:'研',n:'ຄົງ'},{w:12,z:'罗',n:'ມົວ'}];
+// id -> [总工资, 奖金]；眼=研(id11)
+var PAY={1:[4500000,0],2:[4000000,500000],3:[4000000,0],4:[4000000,0],5:[4000000,0],6:[4000000,0],7:[4000000,0],8:[4000000,0],9:[4500000,500000],10:[4500000,500000],11:[4000000,300000],12:[4000000,0]};
+var data=[];
+function loadLocal(){try{var s=JSON.parse(localStorage.getItem('att2')||'[]');if(s.length)return s;}catch(e){}return null;}
+function latestBackup(cb){fetch(API).then(function(r){return r.json();}).then(function(files){
+  var jsons=(files||[]).filter(function(f){return f.name&&f.name.endsWith('.json');});
+  if(!jsons.length){cb(null);return;}
+  jsons.sort(function(a,b){return a.name<b.name?-1:1;});
+  var latest=jsons[jsons.length-1].name;
+  fetch(RAW+latest).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(j){cb(j);}).catch(function(){cb(null);});
+}).catch(function(){cb(null);});}
+function daysInMonth(y,m){return new Date(y,m,0).getDate();} // m 1-based
+function fmt(n){return n.toLocaleString('en-US');}
+function build(){
+  var dates=[...new Set(data.map(function(r){return r.d;}))].sort();
+  var last=dates[dates.length-1];
+  var ym=last.slice(0,7); var py=+ym.slice(0,4), pm=+ym.slice(5,7);
+  var denom=daysInMonth(py,pm);
+  // 本月各人统计
+  var ws={};E.forEach(function(e){ws[e.w]={f:0,h:0,a:0};});
+  data.forEach(function(r){if(r.d.indexOf(ym)===0&&ws[r.w]){if(r.s==='f')ws[r.w].f++;else if(r.s==='h')ws[r.w].h++;else if(r.s==='a')ws[r.w].a++;}});
+  // 今日出勤
+  var dr=data.filter(function(r){return r.d===last;});
+  var df=dr.filter(function(r){return r.s==='f';}).length,dh=dr.filter(function(r){return r.s==='h';}).length,da=dr.filter(function(r){return r.s==='a';}).length;
+  document.getElementById('YM').textContent=ym+'（'+pm+'月）';
+  document.getElementById('DEN').textContent=denom+' 天';
+  document.getElementById('REC').textContent=dates.length+' 天';
+  document.getElementById('TODAY').innerHTML='今日('+last+') 出勤：<b>'+(df+dh)+'</b> 人 · 全天 '+df+' · 半天 '+dh+' · 缺勤 '+da;
+  // 表头
+  document.getElementById('TH').innerHTML='<th>姓名</th><th>全天</th><th>半天</th><th>缺勤</th><th>出勤折算</th><th>应发工资</th><th>应发奖金</th><th>合计</th>';
+  // 表体
+  var tb='',sumS=0,sumB=0,sumT=0;
+  E.forEach(function(e){var w=ws[e.w],p=PAY[e.w];var d=w.f+w.h*0.5;
+    var sal=Math.round((p[0]/denom)*d);var bon=Math.round((p[1]/denom)*d);var tot=sal+bon;
+    sumS+=sal;sumB+=bon;sumT+=tot;
+    tb+='<tr><td class="nm">'+e.z+'<br><small>'+e.n+'</small></td><td>'+w.f+'</td><td>'+w.h+'</td><td>'+w.a+'</td><td>'+(d%1===0?d:d.toFixed(1))+'</td><td>'+fmt(sal)+'</td><td>'+fmt(bon)+'</td><td>'+fmt(tot)+'</td></tr>';});
+  tb+='<tr class="tot"><td class="nm">合计</td><td></td><td></td><td></td><td></td><td>'+fmt(sumS)+'</td><td>'+fmt(sumB)+'</td><td>'+fmt(sumT)+'</td></tr>';
+  document.getElementById('TB').innerHTML=tb;
+  document.getElementById('RULE').textContent='规则：应出勤天数=当月天数；出勤折算=全天×1+半天×0.5；应发工资=总工资÷当月天数×出勤折算；应发奖金=奖金÷当月天数×出勤折算；半天=0.5 个全天。';
+}
+function main(){
+  var auto=loadLocal();
+  if(auto){data=auto;build();}
+  else{document.getElementById('SUB').textContent='加载中…';latestBackup(function(j){
+    if(j){data=j;build();}else{document.getElementById('SUB').textContent='⚠️ 暂无数据，请先在签到页保存考勤。';}
+  });}
+}
+main();
+</script>
+</body>
+</html>
