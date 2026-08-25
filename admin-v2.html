@@ -14,13 +14,14 @@ body{font-family:sans-serif;background:#f5f7fa;color:#333;max-width:480px;margin
 .mnav{display:flex;align-items:center;justify-content:center;gap:16px;margin:16px 0}
 .mnav button{background:white;border:1px solid #ddd;border-radius:12px;width:40px;height:40px;font-size:18px;cursor:pointer}
 .mnav b{font-size:16px;min-width:100px;text-align:center}
-.mstats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
-.ms{background:white;border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.mstats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px}
+.ms{background:white;border-radius:10px;padding:12px 6px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06)}
 .ms b{display:block;font-size:22px}
 .ms small{font-size:11px;color:#888}
 .ms.f b{color:#22c55e}
 .ms.h b{color:#f59e0b}
 .ms.a b{color:#ef4444}
+.ms.n b{color:#94a3b8}
 table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
 th,td{padding:10px 8px;text-align:center;font-size:13px;border-bottom:1px solid #f0f0f0}
 th{background:#f9fafb;font-weight:600;color:#555}
@@ -84,17 +85,22 @@ var REPO='guocheng1378/attendance-tracker',API='https://api.github.com/repos/'+R
 var E=[{id:1,n:'ໂອນ',z:'盘'},{id:2,n:'ມູ',z:'姆'},{id:3,n:'ຣິມ',z:'松'},{id:4,n:'ບາວ',z:'巴'},{id:5,n:'ຊົງ',z:'恩'},{id:6,n:'ຈົງ',z:'乐昂'},{id:7,n:'ເບີນ',z:'文'},{id:8,n:'ຕົງ',z:'米'},{id:9,n:'ຈົງ',z:'拽'},{id:10,n:'ກິນ',z:'春'},{id:11,n:'ຄົງ',z:'研'},{id:12,n:'ມົວ',z:'罗'}];
 var y,m,AR=[],lang='lo',allData=[],ghToken='';
 var TXT={
-lo:{title:'📊 ຫນ້າຈໍຄຸ້ມຄອງ',sub:'ລາຍງານການເຊັນເຂົ້າລາຍເດືອນ',records:'ບັນທຶກ',full:'ທັງມື້',half:'ປາກສາ',abs:'ບໍ່ມາ',colName:'ຊື່',colTotal:'ລວມ',langBtn:'中文',mo:'ເດືອນ',backBtn:'📋 ກັບຄືນ',
+lo:{title:'📊 ຫນ້າຈໍຄຸ້ມຄອງ',sub:'ລາຍງານການເຊັນເຂົ້າລາຍເດືອນ',records:'ບັນທຶກ',full:'ທັງມື້',half:'ປາກສາ',abs:'ບໍ່ມາ',unrecorded:'ບໍ່ໄດ້ລົງທະບຽນ',colName:'ຊື່',colTotal:'ລວມ',langBtn:'中文',mo:'ເດືອນ',backBtn:'📋 ກັບຄືນ',
+c1:'ວັນທີ່',c2:'ຊື່',c3:'ຊື່ຈີນ',c4:'ສະຖານະ',
 title1:'📅 ສົ່ງອອກຕາມວັນ',lbl1:'ຈາກ:',lbl2:'ຫາ:',btnExport:'📥 CSV',btnMonth:'📥 ເດືອນນີ້',
 title2:'💾 ສຳຮອງ',btnBackup:'☁️ ສຳຮອງ',btnList:'📥 ເບິ່ງສຳຮອງ',btnClear:'🗑️ ລຶບ',
-loading:'<span class="spinner"></span>...',ok:'✅ ສຳເລັດ',err:'❌ ມີຂໍ້ຜິດພາດ',confirmClr:'ລຶບທັງໝົດ?',restore:'ກູ້ຄືນ',noBk:'ບໍ່ມີສຳຮອງ',confirmR:'ກູ້ຄືນສຳຮອງ?'},
-zh:{title:'📊 管理后台',sub:'月度考勤汇总',records:'记录',full:'全天',half:'半天',abs:'缺勤',colName:'姓名',colTotal:'共',langBtn:'LOA',mo:'月',backBtn:'📋 返回',
+loading:'<span class="spinner"></span>...',ok:'✅ ສຳເລັດ',err:'❌ ມີຂໍ້ຜິດພາດ',confirmClr:'ລຶບທັງໝົດ?',restore:'ກູ້ຄືນ',noBk:'ບໍ່ມີສຳຮອງ',confirmR:'ກູ້ຄືນສຳຮອງ?',
+noData:'ບໍ່ມີຂໍ້ມູນ',needToken:'ກະລຸນາໃສ່ Token ກ່ອນ'},
+zh:{title:'📊 管理后台',sub:'月度考勤汇总',records:'记录',full:'全天',half:'半天',abs:'缺勤',unrecorded:'未登记',colName:'姓名',colTotal:'共',langBtn:'LOA',mo:'月',backBtn:'📋 返回',
+c1:'日期',c2:'姓名',c3:'中文名',c4:'状态',
 title1:'📅 按时间导出',lbl1:'从:',lbl2:'到:',btnExport:'📥 导出CSV',btnMonth:'📥 导出本月',
 title2:'💾 备份管理',btnBackup:'☁️ 备份到GitHub',btnList:'📥 查看备份',btnClear:'🗑️ 清空',
-loading:'<span class="spinner"></span>...',ok:'✅ 完成',err:'❌ 出错',confirmClr:'清空所有数据？',restore:'恢复',noBk:'暂无备份',confirmR:'恢复这个备份？'}
+loading:'<span class="spinner"></span>...',ok:'✅ 完成',err:'❌ 出错',confirmClr:'清空所有数据？',restore:'恢复',noBk:'暂无备份',confirmR:'恢复这个备份？',
+noData:'暂无数据',needToken:'请先输入Token'}
 };
 function toggleLang(){lang=(lang==='lo')?'zh':'lo';localStorage.setItem('att_lang',lang);ui();render();}
-function ui(){var t=TXT[lang];document.getElementById('LB').textContent=t.langBtn;
+function ui(){var t=TXT[lang];document.title=t.title;
+document.getElementById('LB').textContent=t.langBtn;
 document.getElementById('HT').textContent=t.title;document.getElementById('HP').textContent=t.sub;
 document.getElementById('BLNK').textContent=t.backBtn;
 document.getElementById('P1T').textContent=t.title1;document.getElementById('LBL1').textContent=t.lbl1;document.getElementById('LBL2').textContent=t.lbl2;
@@ -106,54 +112,68 @@ document.getElementById('D1').value=fmt(dd);document.getElementById('D2').value=
 function fmt(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function cm(d){m+=d;if(m>11){m=0;y++;}if(m<0){m=11;y--;}var dd=new Date(y,m,1);var de=new Date(y,m+1,0);
 document.getElementById('D1').value=fmt(dd);document.getElementById('D2').value=fmt(de);render();}
+// 未选择=缺勤(a)；worker id 不在 E 里不再静默丢弃，而是归入 "#<id>" 小结。
 function render(){var t=TXT[lang];document.getElementById('ML').textContent=y+' '+t.mo+' '+(m+1);
 var src=allData.length>0?allData:[];
 if(src.length===0){try{src=JSON.parse(localStorage.getItem('att2'));}catch(e){}if(!src)src=[];}
 var ym=y+'-'+String(m+1).padStart(2,'0');
 AR=src.filter(function(x){return x.d>=ym+'-01'&&x.d<=ym+'-31';});
 var ws={};E.forEach(function(e){ws[e.id]={n:e.n,z:e.z,f:0,h:0,a:0};});
-AR.forEach(function(r){if(r.w&&ws[r.w])ws[r.w][r.s]++;});
-var tf=0,th=0,ta=0;Object.values(ws).forEach(function(w){tf+=w.f;th+=w.h;ta+=w.a;});
+AR.forEach(function(r){if(!r.w)return;if(!ws[r.w])ws[r.w]={n:'#'+r.w,z:'?',f:0,h:0,a:0};
+if(r.s==='f')ws[r.w].f++;else if(r.s==='h')ws[r.w].h++;else if(r.s==='a')ws[r.w].a++;});
+var tf=0,th=0,ta=0;Object.keys(ws).forEach(function(k){tf+=ws[k].f;th+=ws[k].h;ta+=ws[k].a;});
 document.getElementById('MS').innerHTML='<div class="ms"><b>'+AR.length+'</b><small>'+t.records+'</small></div><div class="ms f"><b>'+tf+'</b><small>'+t.full+'</small></div><div class="ms h"><b>'+th+'</b><small>'+t.half+'</small></div><div class="ms a"><b>'+ta+'</b><small>'+t.abs+'</small></div>';
 document.getElementById('TH').innerHTML='<th>'+t.colName+'</th><th>✅ '+t.full+'</th><th>⚠️ '+t.half+'</th><th>❌ '+t.abs+'</th><th>'+t.colTotal+'</th>';
-var tb='';Object.values(ws).forEach(function(w){var tt=w.f*1+w.h*0.5;tb+='<tr><td class="nm">'+w.n+'<br><small>'+w.z+'</small></td><td>'+w.f+'</td><td>'+w.h+'</td><td>'+w.a+'</td><td>'+tt+'</td></tr>';});
+var tb='';Object.keys(ws).forEach(function(k){var w=ws[k];var tt=w.f*1+w.h*0.5;tb+='<tr><td class="nm">'+w.n+'<br><small>'+w.z+'</small></td><td>'+w.f+'</td><td>'+w.h+'</td><td>'+w.a+'</td><td>'+tt+'</td></tr>';});
 document.getElementById('TB').innerHTML=tb;}
 function getSrc(){var s=allData.length>0?allData:[];if(s.length===0){try{s=JSON.parse(localStorage.getItem('att2'));}catch(e){}if(!s)s=[];}return s;}
 function expRange(){var t=TXT[lang];var d1=document.getElementById('D1').value;var d2=document.getElementById('D2').value;if(!d1||!d2)return;
 var s=getSrc().filter(function(x){return x.d>=d1&&x.d<=d2;});dlCSV(s,'attendance_'+d1+'_'+d2+'.csv',t);}
 function expMonth(){var t=TXT[lang];var ym=y+'-'+String(m+1).padStart(2,'0');
 var s=getSrc().filter(function(x){return x.d>=ym+'-01'&&x.d<=ym+'-31';});dlCSV(s,'attendance_'+ym+'.csv',t);}
-function dlCSV(data,name,t){if(data.length===0){alert('No data');return;}
-var sm={f:t.full,h:t.half,a:t.abs};var csv='\uFEFFວັນທີ່,ຊື່,ຊື່ຈີນ,ສະຖານະ\n';
-data.forEach(function(r){csv+=r.d+','+r.n+','+r.z+','+sm[r.s]+'\n';});
+// Fix #7: CSV 字段转义 + 本地化表头 + 无数据提示本地化。
+function q(v){v=String(v==null?'':v);return '"'+v.replace(/"/g,'""')+'"';}
+function dlCSV(data,name,t){if(data.length===0){alert(TXT[lang].noData);return;}
+var sm={f:t.full,h:t.half,a:t.abs,n:t.unrecorded};
+var csv='\uFEFF'+[q(t.c1),q(t.c2),q(t.c3),q(t.c4)].join(',')+'\n';
+data.forEach(function(r){csv+=[q(r.d),q(r.n),q(r.z),q(sm[r.s]||'')].join(',')+'\n';});
 var b=new Blob([csv],{type:'text/csv;charset=utf-8'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();}
-function backupGitHub(){if(!ghToken){alert('请先在签到页输入Token');return;}
+// Fix #2/#4/#6: Bearer 鉴权、备份先查 sha、文件名到秒、按状态码提示错误。
+function authHead(){return {'Authorization':'Bearer '+ghToken,'Content-Type':'application/json'};}
+function apiErr(s){var t=TXT[lang];if(s===401)return t.err+' (401: Token 无效或权限不足)';if(s===403)return t.err+' (403: 无权限或已限流)';if(s===404)return t.err+' (404: 文件或目录不存在)';if(s===422)return t.err+' (422: 覆盖未提供 sha)';return t.err+' ('+s+')';}
+function bkName(){var d=new Date();
+return 'attendance-'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'_'+String(d.getHours()).padStart(2,'0')+String(d.getMinutes()).padStart(2,'0')+String(d.getSeconds()).padStart(2,'0')+'.json';}
+function putContent(fn,contentJson){
+var body={message:'backup '+fn,content:btoa(unescape(encodeURIComponent(contentJson)))};
+return fetch(API+'/contents/backup/'+fn,{headers:{'Authorization':'Bearer '+ghToken}})
+.then(function(r){if(r.ok)return r.json();if(r.status===404)return null;throw r.status;})
+.then(function(ex){if(ex&&ex.sha)body.sha=ex.sha;
+return fetch(API+'/contents/backup/'+fn,{method:'PUT',headers:authHead(),body:JSON.stringify(body)});})
+.then(function(r){if(!r.ok)throw r.status;return r.json();});}
+function backupGitHub(){if(!ghToken){alert(TXT[lang].needToken);return;}
 var t=TXT[lang],st=document.getElementById('ST');st.innerHTML=t.loading;
-var data=getSrc();if(data.length===0){alert('No data');st.innerHTML='';return;}
-var now=new Date();var fn='backup/attendance-'+now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+'_'+String(now.getHours()).padStart(2,'0')+String(now.getMinutes()).padStart(2,'0')+'.json';
-var body=JSON.stringify(data,null,2);
-fetch(API+'/contents/'+fn,{method:'PUT',headers:{'Authorization':'token '+ghToken,'Content-Type':'application/json'},
-body:JSON.stringify({message:'backup '+fn.split('/')[1],content:btoa(unescape(encodeURIComponent(body))),branch:'main'})})
-.then(function(r){return r.json();}).then(function(d){if(d.content){st.innerHTML='✅ '+fn.split('/')[1];}else{st.innerHTML=t.err;}})
-.catch(function(){st.innerHTML=t.err;});}
-function listBackups(){if(!ghToken){alert('请先在签到页输入Token');return;}
+var data=getSrc();if(data.length===0){alert(TXT[lang].noData);st.innerHTML='';return;}
+putContent(bkName(),JSON.stringify(data,null,2))
+.then(function(){st.innerHTML='✅ '+t.ok;setTimeout(function(){st.innerHTML='';},3000);})
+.catch(function(e){st.innerHTML=apiErr(e);});}
+function listBackups(){if(!ghToken){alert(TXT[lang].needToken);return;}
 var t=TXT[lang],st=document.getElementById('ST'),box=document.getElementById('BLISTBOX');
-st.innerHTML=t.loading;
-fetch(API+'/contents/backup',{headers:{'Authorization':'token '+ghToken}})
-.then(function(r){return r.json();}).then(function(files){
+st.innerHTML=t.loading;box.innerHTML='';box.style.display='none';
+fetch(API+'/contents/backup',{headers:{'Authorization':'Bearer '+ghToken}})
+.then(function(r){if(!r.ok)throw r.status;return r.json();}).then(function(files){
 var jsons=files.filter(function(f){return f.name.endsWith('.json');}).sort().reverse();
 if(jsons.length===0){box.innerHTML='<div style="padding:8px;text-align:center;color:#888;font-size:12px">'+t.noBk+'</div>';box.style.display='block';st.innerHTML='';return;}
 var html='';jsons.forEach(function(f){var d=f.name.replace('attendance-','').replace('.json','');
 html+='<div class="bitem"><span>📅 '+d+'</span><button class="rb" onclick="restoreBackup(\''+f.name+'\')">'+t.restore+'</button></div>';});
 box.innerHTML=html;box.style.display='block';st.innerHTML='';})
-.catch(function(){st.innerHTML=t.err;});}
+.catch(function(e){st.innerHTML=apiErr(e);});}
 function restoreBackup(name){if(!confirm(TXT[lang].confirmR))return;
 var t=TXT[lang],st=document.getElementById('ST');st.innerHTML=t.loading;
 fetch(RAW+'backup/'+name+'?t='+Date.now())
-.then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(data){
+.then(function(r){if(!r.ok)throw r.status;return r.json();}).then(function(data){
 localStorage.setItem('att2',JSON.stringify(data));allData=data;render();
 st.innerHTML='✅ '+data.length+' '+t.ok;setTimeout(function(){st.innerHTML='';},3000);})
-.catch(function(){st.innerHTML=t.err;});}
+.catch(function(e){st.innerHTML=apiErr(e);});}
 function clrData(){if(!confirm(TXT[lang].confirmClr))return;
 localStorage.removeItem('att2');allData=[];render();document.getElementById('ST').textContent=TXT[lang].ok;}
 init();ui();render();
