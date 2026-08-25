@@ -11,6 +11,7 @@ body{font-family:sans-serif;background:#f5f7fa;color:#333;max-width:480px;margin
 .hdr h1{font-size:20px}
 .hdr p{font-size:13px;color:#888}
 .lang{position:fixed;top:12px;right:12px;background:#2563eb;color:white;border:none;border-radius:20px;padding:6px 14px;font-size:13px;font-weight:600;cursor:pointer;z-index:99}
+.sal{position:fixed;top:12px;left:12px;background:#7c3aed;color:white;border:none;border-radius:20px;padding:6px 14px;font-size:13px;font-weight:600;cursor:pointer;z-index:99}
 .mnav{display:flex;align-items:center;justify-content:center;gap:16px;margin:16px 0}
 .mnav button{background:white;border:1px solid #ddd;border-radius:12px;width:40px;height:40px;font-size:18px;cursor:pointer}
 .mnav b{font-size:16px;min-width:100px;text-align:center}
@@ -53,6 +54,7 @@ th{background:#f9fafb;font-weight:600;color:#555}
 </style>
 </head>
 <body>
+<button class="sal" onclick="location.href='salary.html'">💵 工资</button>
 <button class="lang" id="LB" onclick="toggleLang()">中文</button>
 <div class="hdr"><h1 id="HT"></h1><p id="HP"></p></div>
 <div class="mnav"><button onclick="cm(-1)">◀</button><b id="ML"></b><button onclick="cm(1)">▶</button></div>
