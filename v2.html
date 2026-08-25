@@ -72,7 +72,7 @@ body{font-family:sans-serif;background:#f5f7fa;color:#333;max-width:480px;margin
 <div class="alnk"><a href="admin-v2.html" id="ALNK"></a></div>
 <div class="stp">
 <label id="TLBL"></label>
-<input id="TI" type="password" placeholder="ghp_xxx...">
+<input id="TI" type="password" placeholder="github_pat_xxx...">
 <button id="TBTN" onclick="svt()"></button>
 <p class="inf" id="TINF"></p>
 <div class="bbtn">
@@ -87,19 +87,22 @@ var REPO='guocheng1378/attendance-tracker',API='https://api.github.com/repos/'+R
 var E=[{id:1,n:'ໂອນ',z:'盘'},{id:2,n:'ມູ',z:'姆'},{id:3,n:'ຣິມ',z:'松'},{id:4,n:'ບາວ',z:'巴'},{id:5,n:'ຊົງ',z:'恩'},{id:6,n:'ຈົງ',z:'乐昂'},{id:7,n:'ເບີນ',z:'文'},{id:8,n:'ຕົງ',z:'米'},{id:9,n:'ຈົງ',z:'拽'},{id:10,n:'ກິນ',z:'春'},{id:11,n:'ຄົງ',z:'研'},{id:12,n:'ມົວ',z:'罗'}];
 var D=new Date(),SS={},dk,lang='lo',ghToken='',allData=[];
 var TXT={
-lo:{title:'ຕາຕະລາງເຊັນເຂົ້າ',sub:'ບັນທຶກການເຂົ້າວຽກປະຈຳວັນ',full:'ທັງມື້',half:'ປາກສາ',abs:'ບໍ່ມາ',save:'ບັນທຶກ',saved:'✅ ຖືກບັນທຶກແລ້ວ!',empty:'ກະລຸນາເລືອກສະຖານະກ່ອນ',admin:'📊 ຫນ້າຈໍຄຸ້ມຄອງ',langBtn:'中文',
+lo:{title:'ຕາຕະລາງເຊັນເຂົ້າ',sub:'ບັນທຶກການເຂົ້າວຽກປະຈຳວັນ',full:'ທັງມື້',half:'ປາກສາ',abs:'ບໍ່ມາ',unrecorded:'ບໍ່ໄດ້ລົງທະບຽນ',save:'ບັນທຶກ',saved:'✅ ຖືກບັນທຶກແລ້ວ!',empty:'ກະລຸນາເລືອກສະຖານະກ່ອນ',admin:'📊 ຫນ້າຈໍຄຸ້ມຄອງ',langBtn:'中文',
 tokLbl:'🔑 GitHub Token',tokBtn:'ບັນທຶກ',tokInf:'ຕື່ມ Token (repo) ເພື່ອສຳຮອງ',
 syncing:'<span class="spinner"></span>...',ok:'✅ ສຳເລັດ',err:'❌ ມີຂໍ້ຜິດພາດ',
+noData:'ບໍ່ມີຂໍ້ມູນ',needToken:'ກະລຸນາໃສ່ Token ກ່ອນ',
 btnBkp:'☁️ ສຳຮອງ',btnList:'📥 ເບິ່ງສຳຮອງ',btnLocal:'📦 ດາວໂຫຼດ',
 restore:'ກູ້ຄືນ',noBk:'ບໍ່ມີສຳຮອງ',confirmR:'ກູ້ຄືນສຳຮອງນີ້?'},
-zh:{title:'考勤签到表',sub:'每日出勤记录',full:'全天',half:'半天',abs:'缺勤',save:'保存记录',saved:'✅ 已保存!',empty:'请先选择考勤状态',admin:'📊 管理后台',langBtn:'LOA',
+zh:{title:'考勤签到表',sub:'每日出勤记录',full:'全天',half:'半天',abs:'缺勤',unrecorded:'未登记',save:'保存记录',saved:'✅ 已保存!',empty:'请先选择考勤状态',admin:'📊 管理后台',langBtn:'LOA',
 tokLbl:'🔑 GitHub Token',tokBtn:'保存',tokInf:'输入 Token (repo) 以备份',
 syncing:'<span class="spinner"></span>...',ok:'✅ 完成',err:'❌ 出错',
+noData:'暂无数据',needToken:'请先输入Token',
 btnBkp:'☁️ 备份到GitHub',btnList:'📥 查看备份',btnLocal:'📦 下载JSON',
 restore:'恢复',noBk:'暂无备份',confirmR:'恢复这个备份？'}
 };
 function toggleLang(){lang=(lang==='lo')?'zh':'lo';localStorage.setItem('att_lang',lang);ui();rl();ls();}
 function ui(){var t=TXT[lang];document.getElementById('LB').textContent=t.langBtn;
+document.title=t.title;
 var h1=document.getElementById('T');if(h1)h1.textContent=t.title;
 var ps=document.getElementById('S');if(ps)ps.textContent=t.sub;
 document.getElementById('sfl').textContent=t.full;document.getElementById('shl').textContent=t.half;document.getElementById('sal').textContent=t.abs;
@@ -123,6 +126,7 @@ function ls(){dk=fd();var src=allData.length>0?allData:[];
 if(src.length===0){try{src=JSON.parse(localStorage.getItem('att2'));}catch(e){}if(!src)src=[];}
 SS={};src.forEach(function(x){if(x.d===dk&&x.w&&x.s)SS[x.w]=x.s;});
 document.querySelectorAll('.wcard').forEach(function(c,i){var eid=E[i].id;var st=SS[eid];c.querySelectorAll('.sbtn').forEach(function(b){b.className='sbtn';});if(st){var map={f:0,h:1,a:2};var btn=c.querySelectorAll('.sbtn')[map[st]];if(btn){var cls={f:'sel',h:'hsel',a:'asel'};btn.className='sbtn '+cls[st];}}});us();}
+// 未选择的人默认记为缺勤(a)。
 function sv(){dk=fd();var k=Object.keys(SS);if(k.length===0){alert(TXT[lang].empty);return;}
 var rec=[];try{rec=JSON.parse(localStorage.getItem('att2'));}catch(e){}if(!rec)rec=[];
 rec=rec.filter(function(x){return x.d!==dk;});
@@ -135,44 +139,47 @@ setTimeout(function(){sbtn.textContent=TXT[lang].save;sbtn.className='svbtn';b.i
 if(ghToken)syncData();}
 function svt(){ghToken=document.getElementById('TI').value.trim();if(!ghToken){ghToken='';}localStorage.setItem('att_gh_token',ghToken);ui();}
 function getRec(){var r=[];try{r=JSON.parse(localStorage.getItem('att2'));}catch(e){}if(!r)r=[];return r;}
+// Fix #2/#4: Bearer 鉴权(兼容 classic 与 fine-grained)、备份先查 sha、文件名到秒、错误按状态码提示。
+function authHead(){return {'Authorization':'Bearer '+ghToken,'Content-Type':'application/json'};}
+function apiErr(s){var t=TXT[lang];if(s===401)return t.err+' (401: Token 无效或权限不足)';if(s===403)return t.err+' (403: 无权限或已限流)';if(s===404)return t.err+' (404: 文件或目录不存在)';if(s===422)return t.err+' (422: 覆盖未提供 sha)';return t.err+' ('+s+')';}
+function bkName(){var d=new Date();
+return 'attendance-'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'_'+String(d.getHours()).padStart(2,'0')+String(d.getMinutes()).padStart(2,'0')+String(d.getSeconds()).padStart(2,'0')+'.json';}
+function putContent(fn,contentJson){
+var body={message:'backup '+fn,content:btoa(unescape(encodeURIComponent(contentJson)))};
+return fetch(API+'/contents/backup/'+fn,{headers:{'Authorization':'Bearer '+ghToken}})
+.then(function(r){if(r.ok)return r.json();if(r.status===404)return null;throw r.status;})
+.then(function(ex){if(ex&&ex.sha)body.sha=ex.sha;
+return fetch(API+'/contents/backup/'+fn,{method:'PUT',headers:authHead(),body:JSON.stringify(body)});})
+.then(function(r){if(!r.ok)throw r.status;return r.json();});}
 function syncData(){if(!ghToken)return;var st=document.getElementById('ST');st.innerHTML=TXT[lang].syncing;
 var rec=getRec();if(rec.length===0){st.innerHTML='';return;}
-var d=new Date();var fn='attendance-'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'_'+String(d.getHours()).padStart(2,'0')+String(d.getMinutes()).padStart(2,'0')+'.json';
-var b=new Blob([JSON.stringify(rec,null,2)],{type:'application/json'});
-fetch(RAW+'backup/'+fn).then(function(r){return r.json();}).catch(function(){return null;}).then(function(exist){
-var bodies={message:'backup '+fn,content:btoa(unescape(encodeURIComponent(JSON.stringify(rec,null,2))))};
-if(exist){bodies.sha=exist.sha;}
-return fetch(API+'/contents/backup/'+fn,{method:'PUT',headers:{'Authorization':'token '+ghToken,'Content-Type':'application/json'},body:JSON.stringify(bodies)});})
-.then(function(r){if(!r.ok)throw r.status;return r.json();})
+putContent(bkName(),JSON.stringify(rec,null,2))
 .then(function(){st.innerHTML='✅ '+TXT[lang].ok;setTimeout(function(){st.innerHTML='';},3000);})
-.catch(function(e){st.innerHTML=TXT[lang].err+' ('+e+')';});}
-function backupGitHub(){if(!ghToken){alert('请先输入Token');return;}var st=document.getElementById('ST');st.innerHTML=TXT[lang].syncing;
-var rec=getRec();if(rec.length===0){st.innerHTML='';alert('No data');return;}
-var d=new Date();var fn='attendance-'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'_'+String(d.getHours()).padStart(2,'0')+String(d.getMinutes()).padStart(2,'0')+'.json';
-var bodies={message:'backup '+fn,content:btoa(unescape(encodeURIComponent(JSON.stringify(rec,null,2))))};
-fetch(API+'/contents/backup/'+fn,{method:'PUT',headers:{'Authorization':'token '+ghToken,'Content-Type':'application/json'},body:JSON.stringify(bodies)})
-.then(function(r){if(!r.ok)throw r.status;return r.json();})
+.catch(function(e){st.innerHTML=apiErr(e);});}
+function backupGitHub(){if(!ghToken){alert(TXT[lang].needToken);return;}var st=document.getElementById('ST');st.innerHTML=TXT[lang].syncing;
+var rec=getRec();if(rec.length===0){st.innerHTML='';alert(TXT[lang].noData);return;}
+putContent(bkName(),JSON.stringify(rec,null,2))
 .then(function(){st.innerHTML='✅ '+TXT[lang].ok;setTimeout(function(){st.innerHTML='';},3000);})
-.catch(function(e){st.innerHTML=TXT[lang].err+' ('+e+')';});}
-function listBackups(){if(!ghToken){alert('请先输入Token');return;}var st=document.getElementById('ST'),box=document.getElementById('BLISTBOX');
+.catch(function(e){st.innerHTML=apiErr(e);});}
+function listBackups(){if(!ghToken){alert(TXT[lang].needToken);return;}var st=document.getElementById('ST'),box=document.getElementById('BLISTBOX');
 st.innerHTML=TXT[lang].syncing;box.innerHTML='';box.style.display='none';
-fetch(API+'/contents/backup',{headers:{'Authorization':'token '+ghToken}})
-.then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(files){
+fetch(API+'/contents/backup',{headers:{'Authorization':'Bearer '+ghToken}})
+.then(function(r){if(!r.ok)throw r.status;return r.json();}).then(function(files){
 var jsons=files.filter(function(f){return f.name.endsWith('.json');}).sort().reverse();
 if(jsons.length===0){box.innerHTML='<div style="padding:8px;text-align:center;color:#888;font-size:12px">'+TXT[lang].noBk+'</div>';box.style.display='block';st.innerHTML='';return;}
 var html='';jsons.forEach(function(f){var d=f.name.replace('attendance-','').replace('.json','');
 html+='<div class="bitem"><span>📅 '+d+'</span><button class="rb" onclick="restoreBackup(\''+f.name+'\',\''+f.sha+'\')">'+TXT[lang].restore+'</button></div>';});
 box.innerHTML=html;box.style.display='block';st.innerHTML='';})
-.catch(function(){st.innerHTML=TXT[lang].err;});}
+.catch(function(e){st.innerHTML=apiErr(e);});}
 function restoreBackup(name,sha){if(!confirm(TXT[lang].confirmR))return;
 var st=document.getElementById('ST');st.innerHTML=TXT[lang].syncing;
 fetch(RAW+'backup/'+name+'?t='+Date.now())
-.then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(data){
+.then(function(r){if(!r.ok)throw r.status;return r.json();}).then(function(data){
 localStorage.setItem('att2',JSON.stringify(data));allData=data;ls();
 st.innerHTML='✅ '+data.length+' '+TXT[lang].ok;
 setTimeout(function(){st.innerHTML='';},3000);})
-.catch(function(){st.innerHTML=TXT[lang].err;});}
-function dlLocal(){var r=getRec();if(r.length===0){alert('No data');return;}
+.catch(function(e){st.innerHTML=apiErr(e);});}
+function dlLocal(){var r=getRec();if(r.length===0){alert(TXT[lang].noData);return;}
 var b=new Blob([JSON.stringify(r,null,2)],{type:'application/json'});
 var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='attendance_'+fd()+'.json';a.click();}
 lang=localStorage.getItem('att_lang')||'lo';
